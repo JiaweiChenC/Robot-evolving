@@ -14,6 +14,8 @@ using namespace std;
 using namespace glm;
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+void drawGrid();
+void drawCoord();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -80,7 +82,7 @@ public:
         glDeleteShader(fragmentShader);
 
         vertices = {
-             coord.x, coord.y, coord.z
+             coord.x, coord.y, coord.z,
         };
         
         glGenVertexArrays(1, &VAO);
@@ -118,6 +120,7 @@ public:
         glDrawArrays(GL_POINTS, 0, 1);
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
+        glDeleteProgram(shaderProgram);
         return 0;
     }
     ~Point() {
@@ -218,6 +221,7 @@ public:
         glDrawArrays(GL_LINES, 0, 2);
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
+        glDeleteProgram(shaderProgram);
         return 0;
     }
 
@@ -243,12 +247,12 @@ glm::vec3 cubePositions[] = {
 
 float skyboxVertices[] = {
     // positions
-    -1.0f,  1.0f, 0.0f,
-    -1.0f, -1.0f, 0.0f,
-     1.0f, -1.0f, 0.0f,
-     1.0f, -1.0f, 0.0f,
-     1.0f,  1.0f, 0.0f,
-    -1.0f,  1.0f, 0.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
 
     -1.0f, -1.0f,  1.0f,
     -1.0f, -1.0f, -1.0f,
@@ -284,6 +288,17 @@ float skyboxVertices[] = {
      1.0f, -1.0f, -1.0f,
     -1.0f, -1.0f,  1.0f,
      1.0f, -1.0f,  1.0f
+};
+
+float planeVertices[] = {
+    // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+     5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+    -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
+    -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+
+     5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+    -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+     5.0f, -0.5f, -5.0f,  2.0f, 2.0f
 };
 
 vector<vector<GLuint>> cubeIndices{
@@ -363,7 +378,7 @@ int main()
     glEnable(GL_DEPTH_TEST);
     // build and compile our shader zprogram
     // ------------------------------------
-    
+    Shader planeShader("cube_0/planeShader.vs", "cube_0/planeShader.fs");
     Shader skyboxShader("cube_0/skybox.vs", "cube_0/skybox.fs");
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -375,6 +390,7 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    unsigned int floorTexture = loadTexture("resources/textures/metal.png");
     vector<std::string> faces
     {
         "resources/textures/skybox/right.jpg",
@@ -385,16 +401,24 @@ int main()
         "resources/textures/skybox/back.jpg",
     };
     unsigned int cubemapTexture = loadCubemap(faces);
-
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);    // load and create a texture
     // -------------------------
+    
+    unsigned int planeVAO, planeVBO;
+    glGenVertexArrays(1, &planeVAO);
+    glGenBuffers(1, &planeVBO);
+    glBindVertexArray(planeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glBindVertexArray(0);
+    planeShader.use();
+    planeShader.setInt("texture1", 0);
 
-    // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
-    // -------------------------------------------------------------------------------------------
-    // or set it via the texture class
-    // render loop
-    // -----------
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -411,34 +435,65 @@ int main()
         
         // render
         // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1, 0, 0));
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 0.0f);
         
-        
+        if ( (int)(T * 10000) % 10  == 0){
         // draw line
-        for (int i=0; i < 28; i++){
-            Line line(vec3(mass0[cubeIndices[i][0]].p), mass0[cubeIndices[i][1]].p);
-            line.setMVP(projection * view * model);
-            line.setColor(vec3(0, 0, 1));
-            line.draw();
-        }
-        for (int i=0; i < 8; i++){
-            Point point(vec3(mass0[i].p));
-            point.setMVP(projection * view * model);
-            point.setColor(vec3(0, 1, 0));
-            if (mass0[i].p[2] < 0){
-                point.setColor(vec3(1, 0, 0));
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            std::cout << T << endl;
+
+            glDepthFunc(GL_LESS);
+            planeShader.use();
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, vec3(0.5, 1, 0.5));
+            planeShader.setMat4("model",  model);
+            planeShader.setMat4("view", view);
+            planeShader.setMat4("projection", projection);
+            glBindVertexArray(planeVAO);
+            glBindTexture(GL_TEXTURE_2D, floorTexture);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glBindVertexArray(0);
+            
+            model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1, 0, 0));
+            model = glm::translate(model, vec3(-0.5, -0.5, -0.5));
+            glDepthFunc(GL_ALWAYS);
+            for (int i=0; i < 28; i++){
+                Line line(vec3(mass0[cubeIndices[i][0]].p), mass0[cubeIndices[i][1]].p);
+                line.setMVP(projection * view * model);
+                line.setColor(vec3(0, 0.5, 1));
+                line.draw();
             }
-            point.draw();
+            
+            for (int i=0; i < 8; i++){
+                Point point(vec3(mass0[i].p));
+                point.setMVP(projection * view * model);
+                point.setColor(vec3(0, 1, 0));
+                if (mass0[i].p[2] < 0.01){
+                    point.setColor(vec3(1, 0, 0));
+                }
+                point.draw();
+            }
+            
+            glDepthFunc(GL_LEQUAL);
+            skyboxShader.use();
+            view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+            skyboxShader.setMat4("view", view);
+            skyboxShader.setMat4("projection", projection);
+            glBindVertexArray(skyboxVAO);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glBindVertexArray(0);
+            glDepthFunc(GL_LESS); // set depth function back to default
+            glfwSwapBuffers(window);
+            glfwPollEvents();
         }
-        cout << "GLOBAL TIME: " <<  T << endl;
-        cout << "At HEIGHT: " << mass0[0].p[2] << endl;
-        cout << "Velocity" << mass0[0].v[2] << endl;
+//        cout << "GLOBAL TIME: " <<  T  << endl;
+//        cout << "At HEIGHT: " << mass0[0].p[2] << endl;
+//        cout << "Velocity" << mass0[0].v[2] << endl;
         // bind textures on corresponding texture units
         
         // render container
@@ -447,24 +502,23 @@ int main()
         // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
         
         // draw box
-//        glBindVertexArray(cubeVAO);
-//        ourShader.setMat4("model", model);
-        glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+        // glBindVertexArray(cubeVAO);
+        // ourShader.setMat4("model", model);
+        // change depth function so depth test passes when values are equal to depth buffer's content
         //skybox cube
-        
-        skyboxShader.use();
-        view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
-        skyboxShader.setMat4("view", view);
-        skyboxShader.setMat4("projection", projection);
-        glBindVertexArray(skyboxVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-        glDepthFunc(GL_LESS); // set depth function back to default
-        
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+//        glDepthFunc(GL_LEQUAL);
+//        skyboxShader.use();
+//        view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+//        skyboxShader.setMat4("view", view);
+//        skyboxShader.setMat4("projection", projection);
+//        glBindVertexArray(skyboxVAO);
+//        glActiveTexture(GL_TEXTURE0);
+//        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+//        glDrawArrays(GL_TRIANGLES, 0, 36);
+//        glBindVertexArray(0);
+//        glDepthFunc(GL_LESS); // set depth function back to default
+//        glfwSwapBuffers(window);
+//        glfwPollEvents();
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
