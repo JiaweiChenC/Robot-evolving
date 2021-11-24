@@ -33,6 +33,107 @@ float deltaTime = 0.0f;    // time between current frame and last frame
 float lastFrame = 0.0f;
 // settings
 
+class DrawFace {
+    int shaderProgram;
+    unsigned int VBO, VAO;
+    vector<float> vertices;
+    vec3 coord0;
+    vec3 coord1;
+    vec3 coord2;
+    mat4 MVP;
+    vec3 faceColor;
+public:
+    DrawFace(vec3 point0, vec3 point1, vec3 point2) {
+        coord0 = point0;
+        coord1 = point1;
+        coord2 = point2;
+        faceColor = vec3(1,1,1);
+        const char *vertexShaderSource = "#version 330 core\n"
+            "layout (location = 0) in vec3 aPos;\n"
+            "uniform mat4 MVP;\n"
+            "void main()\n"
+            "{\n"
+            "   gl_Position = MVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+            "}\0";
+        const char *fragmentShaderSource = "#version 330 core\n"
+            "out vec4 FragColor;\n"
+            "uniform vec3 color;\n"
+            "void main()\n"
+            "{\n"
+            "   FragColor = vec4(color, 1.0f);\n"
+            "}\n\0";
+
+        // vertex shader
+        int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+        glCompileShader(vertexShader);
+        // check for shader compile errors
+
+        // fragment shader
+        int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+        glCompileShader(fragmentShader);
+        // check for shader compile errors
+
+        // link shaders
+        shaderProgram = glCreateProgram();
+        glAttachShader(shaderProgram, vertexShader);
+        glAttachShader(shaderProgram, fragmentShader);
+        glLinkProgram(shaderProgram);
+        // check for linking errors
+
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+
+        float vertices[] = {
+             coord0.x, coord0.y, coord0.z,
+             coord1.x, coord1.y, coord1.z,
+             coord2.x, coord2.y, coord2.z,
+        };
+        
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glBindVertexArray(VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+
+    }
+
+    int setMVP(mat4 mvp) {
+        MVP = mvp;
+        return 0;
+    }
+
+    int setColor(vec3 color) {
+        faceColor = color;
+        return 0;
+    }
+
+    int draw() {
+        glUseProgram(shaderProgram);
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+        glUniform3fv(glGetUniformLocation(shaderProgram, "color"), 1, &faceColor[0]);
+
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+        glDeleteProgram(shaderProgram);
+        return 0;
+    }
+    ~DrawFace() {
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+        glDeleteProgram(shaderProgram);
+    }
+};
 class Point {
     int shaderProgram;
     unsigned int VBO, VAO;
@@ -116,7 +217,7 @@ public:
         glUniform3fv(glGetUniformLocation(shaderProgram, "color"), 1, &pointColor[0]);
 
         glBindVertexArray(VAO);
-        glPointSize(10.0f);
+        glPointSize(15.0f);
         glDrawArrays(GL_POINTS, 0, 1);
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
@@ -232,18 +333,6 @@ public:
         glDeleteProgram(shaderProgram);
     }
 };
-glm::vec3 cubePositions[] = {
-  glm::vec3( 0.0f,  0.0f,  0.0f),
-  glm::vec3( 2.0f,  5.0f, 5.0f),
-  glm::vec3(1.5f, -2.2f, -2.5f),
-  glm::vec3(-3.8f, -2.0f, -12.3f),
-  glm::vec3( 2.4f, -0.4f, -3.5f),
-  glm::vec3(-1.7f,  3.0f, -7.5f),
-  glm::vec3( 1.3f, -2.0f, -2.5f),
-  glm::vec3( 1.5f,  2.0f, -2.5f),
-  glm::vec3( 1.5f,  0.2f, -1.5f),
-  glm::vec3(-1.3f,  1.0f, -1.5f)
-};
 
 float skyboxVertices[] = {
     // positions
@@ -338,11 +427,35 @@ vector<vector<GLuint>> cubeIndices{
     {6, 7}
 };
 
+vector<vector<GLuint>> faceIndices{
+    {0, 1, 2},
+    {0, 2, 3},
+    
+    {4, 5, 6},
+    {4, 6, 7},
+    
+    {1, 2, 5},
+    {2, 5, 6},
+    
+    {0, 4, 3},
+    {3, 4, 7},
+    
+    {2, 3, 6},
+    {3, 6, 7},
+    
+    {1, 0, 5},
+    {0, 4, 5}
+};
+
 vector<Mass> mass0 = generateMass(0.1, 0.1, 0, 0, 0.1);
 vector<Spring> spring0 = generateSpring(5000);
 
 int main()
 {
+    createCube();
+    for (const auto& i: imMasses){
+        cout << "masses index: " << i << endl;
+    }
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -390,7 +503,7 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    unsigned int floorTexture = loadTexture("resources/textures/metal.png");
+    unsigned int floorTexture = loadTexture("resources/textures/bricks2.jpg");
     vector<std::string> faces
     {
         "resources/textures/skybox/right.jpg",
@@ -460,21 +573,27 @@ int main()
             model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1, 0, 0));
             model = glm::translate(model, vec3(-0.5, -0.5, -0.5));
             glDepthFunc(GL_ALWAYS);
-            for (int i=0; i < 28; i++){
-                Line line(vec3(mass0[cubeIndices[i][0]].p), mass0[cubeIndices[i][1]].p);
-                line.setMVP(projection * view * model);
-                line.setColor(vec3(0, 0.5, 1));
-                line.draw();
-            }
+//            for (int i=0; i < 28; i++){
+//                Line line(vec3(mass0[cubeIndices[i][0]].p), mass0[cubeIndices[i][1]].p);
+//                line.setMVP(projection * view * model);
+//                line.setColor(vec3(0, 0, 1));
+//                line.draw();
+//            }
             
             for (int i=0; i < 8; i++){
                 Point point(vec3(mass0[i].p));
                 point.setMVP(projection * view * model);
                 point.setColor(vec3(0, 1, 0));
                 if (mass0[i].p[2] < 0.01){
-                    point.setColor(vec3(1, 0, 0));
+                    point.setColor(vec3(0.1, 0.9, 0.2));
                 }
                 point.draw();
+            }
+            for (int i = 0; i < 12; i++) {
+                DrawFace face(mass0[faceIndices[i][0]].p, mass0[faceIndices[i][1]].p, mass0[faceIndices[i][2]].p);
+                face.setMVP(projection * view * model);
+                face.setColor(vec3(0.9, 0.4, 0.9));
+                face.draw();
             }
             
             glDepthFunc(GL_LEQUAL);

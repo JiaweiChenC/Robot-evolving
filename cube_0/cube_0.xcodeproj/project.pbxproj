@@ -186,6 +186,8 @@
 		4E6E0E64273EDD3400A66F14 /* 3.3.shader.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = 3.3.shader.fs; sourceTree = "<group>"; };
 		4E6E0E69273EDDED00A66F14 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		4E6E0E6B273EDEB800A66F14 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../../../opt/homebrew/Cellar/glfw/3.3.4/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
+		4EBDB916274EC57E00439921 /* planeShader.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = planeShader.vs; sourceTree = "<group>"; };
+		4EBDB917274EC57E00439921 /* planeShader.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = planeShader.fs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -223,7 +225,6 @@
 		4E6E0D92273EDC0C00A66F14 /* cube_0 */ = {
 			isa = PBXGroup;
 			children = (
-				4E6E0DB4273EDD1700A66F14 /* Cube.hpp */,
 				4E6E0DBD273EDD1700A66F14 /* camera.hpp */,
 				4E6E0DB7273EDD1700A66F14 /* stb_image.hpp */,
 				4E6E0DB3273EDD1700A66F14 /* cubeshader.fs */,
@@ -232,6 +233,9 @@
 				4E6E0DB8273EDD1700A66F14 /* lineShader.vs */,
 				4E6E0DBB273EDD1700A66F14 /* cubeshader.vs */,
 				4E6E0DB9273EDD1700A66F14 /* skybox.fs */,
+				4EBDB917274EC57E00439921 /* planeShader.fs */,
+				4EBDB916274EC57E00439921 /* planeShader.vs */,
+				4E6E0DB4273EDD1700A66F14 /* Cube.hpp */,
 				4E6E0DBA273EDD1700A66F14 /* Cube.cpp */,
 				4E6E0DBC273EDD1700A66F14 /* main.cpp */,
 			);
@@ -317,6 +321,7 @@
 				4E6E0DCD273EDD2D00A66F14 /* container2_specular.png */,
 				4E6E0DCE273EDD2D00A66F14 /* powerup_passthrough.png */,
 				4E6E0DCF273EDD2D00A66F14 /* paddle.png */,
+				4E6E0DE8273EDD2D00A66F14 /* bricks2.jpg */,
 				4E6E0DD0273EDD2D00A66F14 /* hdr */,
 				4E6E0DD2273EDD2D00A66F14 /* brickwall.jpg */,
 				4E6E0DD3273EDD2D00A66F14 /* toy_box_normal.png */,
@@ -334,7 +339,6 @@
 				4E6E0DDF273EDD2D00A66F14 /* powerup_confuse.png */,
 				4E6E0DE0273EDD2D00A66F14 /* awesomeface.png */,
 				4E6E0DE1273EDD2D00A66F14 /* skybox */,
-				4E6E0DE8273EDD2D00A66F14 /* bricks2.jpg */,
 				4E6E0DE9273EDD2D00A66F14 /* marble.jpg */,
 				4E6E0DEA273EDD2D00A66F14 /* powerup_increase.png */,
 				4E6E0DEB273EDD2D00A66F14 /* particle.png */,

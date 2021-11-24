@@ -3,22 +3,18 @@ double mass = 0.1;
 double LENGTH = 0.1;
 double gravity = 9.81;
 double T = 0;
-double springPotentialEnergy = 0;
-double gravityPotentialEnergy = 0;
-double totalPotentialEnergy = 0;
-double kineticEnergy = 0;
-double totalEnergy = 0;
-double groundEnergy = 0;
-
+double L0 = 0.1;
 double dt = 0.002;
 double restoreConstant = 10000;
 double springConstant = 5000;
 double DAMPING = 0.9;
 double frictionCoefficient = 0;//0.8;
-
+int DIM = 3;
 using namespace std;
 
-
+vector<Mass> masses;
+vector<Spring> springs;
+vector<int> imMasses;
 
 vector<Mass> generateMass(double mass, double LENGTH, double initialX, double initialY, double initialZ)
 {
@@ -33,6 +29,7 @@ vector<Mass> generateMass(double mass, double LENGTH, double initialX, double in
     mass_on_cube[7] = {mass,{initialX-LENGTH/2,initialY+LENGTH/2,initialZ+LENGTH},{0,0,0},{0,0,0}};
     return mass_on_cube;
 }
+
 
 std::vector<Spring> generateSpring(double springConstant)
 {
@@ -87,6 +84,12 @@ double norm( double x[], std::size_t sz )
     return sqrt(res);
 }
 
+bool theSame(Mass m1, Mass m2){
+    if (distance(m1.p, m2.p) < 0.00001){
+        return true;
+    }
+    return false;
+}
 
 void cubeUpdate(std::vector<Mass>& mass_on_cube, std::vector<Spring>& cubeSprings, int option)
 {
@@ -123,7 +126,7 @@ void cubeUpdate(std::vector<Mass>& mass_on_cube, std::vector<Spring>& cubeSpring
             cubeForces[cubeSprings[i].m2][2] = cubeForces[cubeSprings[i].m2][2] + direstion[2]*force;
         }
         // calcualte spring potential energy
-        springPotentialEnergy = springPotentialEnergy + cubeSprings[i].k * pow((L - cubeSprings[i].L),2)/2;
+
     }
     // loop through all masses
     for (int i = 0; i < (int)mass_on_cube.size(); i++)
@@ -135,7 +138,7 @@ void cubeUpdate(std::vector<Mass>& mass_on_cube, std::vector<Spring>& cubeSpring
         if (mass_on_cube[i].p[2] <= 0)
         {
             cubeForces[i][2] = cubeForces[i][2] + restoreConstant * fabs(mass_on_cube[i].p[2]);
-            groundEnergy = groundEnergy + restoreConstant * pow(mass_on_cube[i].p[2],2)/2;
+
         }
         // update acceleration
         mass_on_cube[i].a[0] = cubeForces[i][0]/mass_on_cube[i].m;
@@ -150,20 +153,84 @@ void cubeUpdate(std::vector<Mass>& mass_on_cube, std::vector<Spring>& cubeSpring
         mass_on_cube[i].p[1] = mass_on_cube[i].p[1] + mass_on_cube[i].v[1] * dt;
         mass_on_cube[i].p[2] = mass_on_cube[i].p[2] + mass_on_cube[i].v[2] * dt;
         // calculate gravity potential energy
-        gravityPotentialEnergy = gravityPotentialEnergy + mass_on_cube[i].m * gravity * mass_on_cube[i].p[2];
-        // calculate kinetic energy
-        kineticEnergy = kineticEnergy + mass_on_cube[i].m * pow(norm(mass_on_cube[i].v,3),2) / 2;
+
     }
-    totalPotentialEnergy = springPotentialEnergy + gravityPotentialEnergy + groundEnergy;
-    totalEnergy = totalPotentialEnergy + kineticEnergy;
+
     // update time
     T = T + dt;
     // re-initilize energy variable
-    kineticEnergy = 0;
-    springPotentialEnergy = 0;
-    gravityPotentialEnergy = 0;
-    totalPotentialEnergy = 0;
-    groundEnergy = 0;
-    totalEnergy = 0;
 }
 
+void createCube (double x, double y, double z) {
+    int n = (int)masses.size();
+    // int n2 = (int)springs.size();
+    // first create 8 masses
+    vector<Mass> tempMasses(8);
+    tempMasses[0] = {mass,{x+LENGTH/2,y+LENGTH/2,z},{0,0,0},{0,0,0}};
+    tempMasses[1] = {mass,{x+LENGTH/2,y-LENGTH/2,z},{0,0,0},{0,0,0}};
+    tempMasses[2] = {mass,{x-LENGTH/2,y-LENGTH/2,z},{0,0,0},{0,0,0}};
+    tempMasses[3] = {mass,{x-LENGTH/2,y+LENGTH/2,z},{0,0,0},{0,0,0}};
+    tempMasses[4] = {mass,{x+LENGTH/2,y+LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
+    tempMasses[5] = {mass,{x+LENGTH/2,y-LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
+    tempMasses[6] = {mass,{x-LENGTH/2,y-LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
+    tempMasses[7] = {mass,{x-LENGTH/2,y+LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
+    
+    // check the mass created if coinciding with the previous cube if is
+    // make m = 0 coinciding pushback the mass overlap, imMasses pushback
+    // record all the indices
+    vector<int> coinciding;
+    for (int j = 0; j < tempMasses.size(); j++) {
+        for (int i = 0; i < masses.size(); i++) {
+            if (theSame(tempMasses[j], masses[i])) {
+                tempMasses[j].m = 0;
+                coinciding.push_back(i);
+                imMasses.push_back(i);
+            }
+        }
+    }
+    
+    // pushback the not coinciding masses
+    int count = 0;
+    for (int i = 0; i < tempMasses.size(); i++) {
+        if(tempMasses[i].m != 0) {
+            masses.push_back(tempMasses[i]);
+            imMasses.push_back(n+count);
+            count++;
+        }
+    }
+    
+    // create springs, this is for the nonconinciding masses
+    for (int i = n; i < masses.size() - 1; i++) {
+        for (int j = i+1; j < masses.size(); j++) {
+            Spring s;
+            s.k = springConstant;
+            s.m1 = j;
+            s.m2 = i;
+            s.L = distance(masses[i].p, masses[j].p);
+            springs.push_back(s);
+        }
+    }
+    
+    // create springs, this is for the coinciding masses
+    for (int i = 0; i < coinciding.size(); i++) {
+        for (int j = n; j < masses.size(); j++) {
+            Spring s;
+            s.k = springConstant;
+            s.m1 = coinciding[i];
+            s.m2 = j;
+            s.L = distance(masses[s.m1].p, masses[s.m2].p);
+            springs.push_back(s);
+        }
+    }
+}
+
+// Robot is a set of cube
+void createRobot(){
+    for (int i = 0; i < DIM; i++){
+        for (int j = 0; j < DIM; j++){
+            for (int k = 0; k < DIM; k++){
+                createCube((double)(i)/10.0, (double)(j)/10.0, (double)(k)/10.0);
+            }
+        }
+    }
+}

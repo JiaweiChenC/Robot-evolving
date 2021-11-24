@@ -28,12 +28,12 @@ extern double GROUNDCONSTANT;
 extern double FRICTION_COEF;
 extern double DAMPING;
 extern double T;
-extern double springPotentialEnergy;
-extern double gravityPotentialEnergy;
-extern double totalPotentialEnergy;
-extern double kineticEnergy;
-extern double totalEnergy;
-extern double groundEnergy;
+extern double L0;
+extern int Dim;
+extern vector<Mass> masses;
+extern vector<Spring> springs;
+extern vector<int> imMasses;
+
 
 using namespace std;
 
@@ -41,8 +41,8 @@ struct Mass
 {
     double m;           // mass
     glm::vec3 p;       // positon x, y, z
-    double v[3];        // velocity x, y, z
-    double a[3];        // acceleration
+    glm::vec3 v;        // velocity x, y, z
+    glm::vec3 a;        // acceleration
 };
 
 struct Spring
@@ -51,11 +51,27 @@ struct Spring
     double L;      // original length
     int m1;         // connected mass 1
     int m2;         // connected mass 2
+    double a = LENGTH;
+    double b = 0.1;
+    double c = 0.1;
 };
 
+class Cube {
+public:
+    int index;
+    vector<Mass> cubeMass;
+    vector<Spring> cubeSpring;
+    // constructor
+    Cube(double x, double y, double z);
+};
+
+class Robot {
+    vector<Cube> robotCube;
+};
 
 vector<Mass> generateMass(double mass, double length, double X, double Y, double Z);
 vector<Spring> generateSpring(double springConstant);
 void cubeUpdate(vector<Mass>& cubeMass, vector<Spring>& cubeSpring, int mode);
 double getDistance(double distance_vector[3]);
-
+void createCube();
+void createRobot();
