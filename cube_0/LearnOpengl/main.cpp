@@ -48,7 +48,6 @@ GLuint myEdge_indices[cube_num * 24 * robot_num]; // cube_count * 12 * 2
 GLdouble myShade_vertex[cube_num * 24 * robot_num];
 GLdouble myShade_color[cube_num * 24 * robot_num];
 GLuint myShadeindices[cube_num * 36 * robot_num];
-GLdouble springVertices[372 * 3 * 2];
 
 
 float skyboxVertices[] = {
@@ -127,30 +126,56 @@ vector<vector<GLuint>> faceIndices{
     {0, 4, 5}
 };
 
+vector<vector<GLuint>> edgeIndices{
+    {0, 1},
+    {1, 2},
+    
+    {2, 3},
+    {3, 0},
+    
+    {4, 5},
+    {5, 6},
+    
+    {6, 7},
+    {4, 7},
+    
+    {0, 4},
+    {3, 7},
+    
+    {1, 5},
+    {2, 6}
+};
 vector<Mass> mass0 = generateMass(0.1, 0.1, 0, 0, 0.1);
 vector<Spring> spring0 = generateSpring(5000);
 
 int main()
 {
     createRobot();
-    renewIndicesVertices();
-    for (const auto& i: imMasses){
-        cout << "masses index: " << i << endl;
+    someStuffToMakesuretheDrawingWroking();
+    for (const auto& edge: myEdge_indices) {
+        cout << "edge: " << edge << endl;
     }
+    //updateVertices();
+//    for (const auto& spring: springs) {
+//        cout << spring.m1 <<' '<< spring.m2 << endl;
+//    }
+//    for (const auto& i: imMasses){
+//        cout << "masses index: " << i << endl;
+//    }
 //    for (const auto& mass: masses){
 //        cout << "massPosition\n" << "x: " << mass.p[0] << "y: " << mass.p[1] <<"z: " <<  mass.p[2] << endl;
+//   }
+//    for (const auto& i: cubeIndices) {
+//        cout << "triangle indices: " << i << endl;
 //    }
-    for (const auto& i: cubeIndices) {
-        cout << "triangle indices: " << i << endl;
-    }
-    for (const auto& i: cubeVertices) {
-        cout << "vertices: " << i << endl;
-    }
-    cout << "vertices " << sizeof(cubeVertices) << endl;
-    cout << "num indices: " << sizeof(cubeIndices) << endl;
-    cout << "number masses: " << masses.size() << endl;
-    cout << "number springs: " << springs.size() << endl;
-    cout <<"mass index: " << imMasses.size() << endl;
+//    for (const auto& i: cubeVertices) {
+//        cout << "vertices: " << i << endl;
+//    }
+//    cout << "vertices " << sizeof(cubeVertices) << endl;
+//    cout << "num indices: " << sizeof(cubeIndices) << endl;
+//    cout << "number masses: " << masses.size() << endl;
+//    cout << "number springs: " << springs.size() << endl;
+//    cout <<"mass index: " << imMasses.size() << endl;
     
     // glfw: initialize and configure
     // ------------------------------
@@ -236,9 +261,23 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_DYNAMIC_DRAW);
     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
     glEnableVertexAttribArray(0);
+    
+    Shader edgeShader("cube_0/lineShader.vs", "cube_0/lineShader.fs");
+    unsigned int edgeVAO, edgeVBO, edgeEBO;
+    glGenVertexArrays(1, &edgeVAO);
+    glGenBuffers(1, &edgeVBO);
+    glGenBuffers(1, &edgeEBO);
+    glBindVertexArray(edgeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, edgeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edgeEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(myEdge_indices), myEdge_indices, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
+    glEnableVertexAttribArray(0);
+    
 //    Shader cubeShader("cube_0/standardShader.vs", "cube_0/standardShader.fs");
 //    unsigned int pointVAO, pointVBO;
 //    glGenVertexArrays(1, &pointVAO);
@@ -275,6 +314,9 @@ int main()
         
         if (true){
         // draw line
+            //updateRobot();
+            updateVertices();
+            cout << "global Time Now: " << T <<  endl;
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             // std::cout << "Global Time now: " << T << endl;
@@ -306,9 +348,22 @@ int main()
             cubeShader.use();
             cubeShader.setMat4("MVP", projection * view * model);
             glBindVertexArray(cubeVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
             glDrawElements(GL_TRIANGLES, 12 * 3 * 27, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
+            
+            glDepthFunc(GL_ALWAYS);
+            edgeShader.use();
+            edgeShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(edgeVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, edgeVBO);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+            glDrawElements(GL_LINES, 12 * 2 * 27, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
 //            for (int i=0; i < 28; i++){
 //                Line line(vec3(mass0[cubeIndices[i][0]].p), mass0[cubeIndices[i][1]].p);
 //                line.setMVP(projection * view * model);
@@ -546,7 +601,6 @@ void createCube (double x, double y, double z) {
             s.k = springConstant;
             s.m1 = j;
             s.m2 = i;
-            s.L = distance(masses[i].p, masses[j].p);
             springs.push_back(s);
         }
     }
@@ -558,9 +612,11 @@ void createCube (double x, double y, double z) {
             s.k = springConstant;
             s.m1 = coinciding[i];
             s.m2 = j;
-            s.L = distance(masses[s.m1].p, masses[s.m2].p);
             springs.push_back(s);
         }
+    }
+    for (Spring& spring: springs){
+        spring.L0 = distance(masses[spring.m1].p, masses[spring.m2].p);
     }
 }
 
@@ -576,64 +632,79 @@ void createRobot(){
     }
 }
 
-void updateRobot() {
-    for (int i = 0; i < springs.size(); i++) {
-        if (i % 8 == 0) {
-            springs[i].a = a;
-            springs[i].b = b;
-            springs[i].c = c;
-        }
-        springs[i].L = springs[i].a + springs[i].b*sin(T*omega + springs[i].c);
-    }
-    
-    for (int i = 0; i < masses.size(); i++) {
-        glm::dvec3 currentForce(0.0);
-        double F_c = 0;
-        double F_h = 0;
-        double F_v = 0;
-        
-        // force from the ground, including F_c and friction
-        if (masses[i].p[2] < 0) {
-            F_c = -kGround * masses[i].p[2] + GRAVITY.z * MASS;
-            currentForce.z = currentForce.z + F_c;
-            F_h = sqrt(pow(currentForce.x, 2) +  pow(currentForce.y, 2));
-            F_v = currentForce.z;
-            if (F_h < mu * F_v) {
-                masses[i].p[0] = 0;
-                masses[i].p[1] = 0;
-            }
-            else {
-                currentForce.x = currentForce.x - F_v * mu;
-                currentForce.y = currentForce.y - F_v * mu;
-            }
-        }
-        for (int j = 0; j < springs.size(); j++) {
-            if(springs[j].m1 == i || springs[j].m2 == i) {
-                glm::dvec3 springForce(0.0);
-                double currentLength = distance(masses[springs[j].m1].p, masses[springs[j].m2].p);
-                double F = springs[j].k * (currentLength - LENGTH);
-                if(springs[j].m1!=i) {
-                    springForce = F * (masses[springs[j].m1].p - masses[springs[j].m2].p)/currentLength;
-                }
-                else {
-                    springForce = F * (masses[springs[j].m2].p - masses[springs[j].m1].p)/currentLength;
-                }
-                currentForce = currentForce + springForce;
-            }
-        }
-        
-        currentForce.z = currentForce.z + GRAVITY.z * MASS;
-        masses[i].v *= DAMPING;
-        masses[i].a = currentForce/MASS;
-        masses[i].v += masses[i].a * dt;
-        masses[i].p += masses[i].p * dt;
-    }
-    T += dt;
-}
+//void updateRobot() {
+////    for (int i = 0; i < springs.size(); i++) {
+////        if (i % 8 == 0) {
+////            springs[i].a = a;
+////            springs[i].b = b;
+////            springs[i].c = c;
+////            springs[i].L0 = springs[i].a + springs[i].b*sin(T*omega + springs[i].c);
+////        }
+////    }
+////
+//    for (int i = 0; i < masses.size(); i++) {
+//        glm::dvec3 currentForce(0.0);
+//        double F_c = 0;
+//        double F_h = 0;
+//        double F_v = 0;
+//        for (const Spring spring: springs) {
+////            cout << "springLength: " << spring.L0 << endl;
+//            if(spring.m1 == i || spring.m2 == i) {
+////                cout << springs[i].m1 << " " << springs[i].m2 << endl;
+//                glm::dvec3 springForce(0.0);
+//                glm::dvec3 direction(0.0);
+//                direction = glm::normalize(masses[spring.m2].p - masses[spring.m1].p);
+//                double currentLength = distance(masses[spring.m1].p, masses[spring.m2].p);
+////                cout <<"current Length: " << currentLength <<  endl;
+//                double F = spring.k * (currentLength - spring.L0);
+////                cout << "current f" << F << endl;
+////                cout << "direction " << direction.x << endl;
+//                if(spring.m1 == i) {
+//                    springForce = F * direction;
+//                }
+//                else {
+//                    springForce = -F * direction;
+//                }
+//                currentForce += + springForce;
+//            }
+//        }
+//        if (masses[i].p[2] < 0) {
+//            F_c = -kGround * masses[i].p[2];
+//            cout << "fc" << F_c << endl;
+//            currentForce.z = currentForce.z + F_c;
+//            F_h = sqrt(pow(currentForce.x, 2) +  pow(currentForce.y, 2));
+//            F_v = currentForce.z;
+//            if (F_h < mu * F_v) {
+//                masses[i].p[0] = 0;
+//                masses[i].p[1] = 0;
+//            }
+//            else {
+//                currentForce.x = currentForce.x - F_v * mu;
+//                currentForce.y = currentForce.y - F_v * mu;
+//            }
+//        }
+//
+//        currentForce.z = currentForce.z + GRAVITY.z * MASS;
+//        masses[i].v *= DAMPING;
+//        cout << "velocity: "<< masses[i].v[0] << endl;
+//        masses[i].a = currentForce/MASS;
+//        masses[i].v += masses[i].a * dt;
+//        masses[i].p += masses[i].v * dt;
+//    }
+//    T += dt;
+//}
 
 
 // renew indices!
-void renewIndicesVertices() {
+void updateVertices() {
+    for (int i = 0; i < masses.size(); i++) {
+        for (int j = 0; j < 3; j++) {
+            cubeVertices[3 * i + j] = masses[i].p[j];
+        }
+    }
+}
+
+void someStuffToMakesuretheDrawingWroking() {
     for (int i = 0; i < DIM*DIM*DIM; i++) {
         vector<int> tempCube(8);
         vector<int> upper(0);
@@ -669,8 +740,8 @@ void renewIndicesVertices() {
                 back.push_back(upper[n]);
             }
         }
-        cout << "front: " << front.size() << endl;
-        cout << "back: " << back.size() << endl;
+//        cout << "front: " << front.size() << endl;
+//        cout << "back: " << back.size() << endl;
         // change the position if wrong
         if (masses[front[0]].p.y < masses[back[0]].p.y) {
             vector<int> temp = front;
@@ -712,18 +783,17 @@ void renewIndicesVertices() {
         }
         for (int j = 0; j < 8; j++) {
             imMasses[8 * i + j] = tempCube[j];
-        }
+        };
         
         for (int k = 0; k < 12; k++) {
             cubeIndices[36 * i + 3 * k] = tempCube[faceIndices[k][0]];
             cubeIndices[36 * i + 1 + 3 * k] = tempCube[faceIndices[k][1]];
             cubeIndices[36 * i + 2 + 3 * k] = tempCube[faceIndices[k][2]];
         }
-    }
-    
-    for (int i = 0; i < masses.size(); i++) {
-        for (int j = 0; j < 3; j++) {
-            cubeVertices[3 * i + j] = masses[i].p[j];
+        
+        for (int g = 0; g < 12; g++) {
+            myEdge_indices[24 * i + 2 * g] = tempCube[edgeIndices[g][0]];
+            myEdge_indices[24 * i + 2 * g + 1] = tempCube[edgeIndices[g][1]];
         }
     }
 }

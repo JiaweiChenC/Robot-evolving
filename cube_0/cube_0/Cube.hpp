@@ -45,11 +45,11 @@ struct Mass
 
 struct Spring
 {
-    double k;       // spring constant
-    double L;      // original length
+    double k = 10000;       // spring constant
+    double L0;      // original length
     int m1;         // connected mass 1
     int m2;         // connected mass 2
-    double a = LENGTH;
+    double a = L0;
     double b = 0;
     double c = 0;
 };
@@ -75,6 +75,7 @@ double getDistance(double distance_vector[3]);
 void createCube();
 void createRobot();
 void updateRobot();
-void renewIndicesVertices();
+void updateVertices();
+void someStuffToMakesuretheDrawingWroking();
 bool theSame(Mass m1, Mass m2);
 #endif /* Cube_hpp */

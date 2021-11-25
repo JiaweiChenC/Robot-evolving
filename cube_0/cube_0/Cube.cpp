@@ -4,7 +4,7 @@ double LENGTH = 0.1;
 double gravity = 9.81;
 double T = 0;
 double L0 = 0.1;
-double dt = 0.002;
+double dt = 0.0002;
 double mu = 0.8;
 int DIM = 3;
 double omega = 10;
@@ -102,10 +102,10 @@ void cubeUpdate(std::vector<Mass>& mass_on_cube, std::vector<Spring>& cubeSpring
         Mass mass2 = mass_on_cube[cubeSprings[i].m2];
         double positionDiff[3] = {mass2.p[0] - mass1.p[0],mass2.p[1] - mass1.p[1],mass2.p[2] - mass1.p[2]};
         double L = norm(positionDiff,3);
-        double force = cubeSprings[i].k * fabs(cubeSprings[i].L - L);
+        double force = cubeSprings[i].k * fabs(cubeSprings[i].L0 - L);
         double direstion[3] = {positionDiff[0]/L,positionDiff[1]/L,positionDiff[2]/L};
         // contraction case
-        if (L > cubeSprings[i].L)
+        if (L > cubeSprings[i].L0)
         {
             cubeForces[cubeSprings[i].m1][0] = cubeForces[cubeSprings[i].m1][0] + direstion[0]*force;
             cubeForces[cubeSprings[i].m1][1] = cubeForces[cubeSprings[i].m1][1] + direstion[1]*force;
@@ -115,7 +115,7 @@ void cubeUpdate(std::vector<Mass>& mass_on_cube, std::vector<Spring>& cubeSpring
             cubeForces[cubeSprings[i].m2][2] = cubeForces[cubeSprings[i].m2][2] - direstion[2]*force;
         }
         // expansion case
-        else if (L < cubeSprings[i].L)
+        else if (L < cubeSprings[i].L0)
         {
             cubeForces[cubeSprings[i].m1][0] = cubeForces[cubeSprings[i].m1][0] - direstion[0]*force;
             cubeForces[cubeSprings[i].m1][1] = cubeForces[cubeSprings[i].m1][1] - direstion[1]*force;

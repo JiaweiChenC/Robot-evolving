@@ -12,6 +12,7 @@
 		4E6E0DC3273EDD1700A66F14 /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E6E0DBE273EDD1700A66F14 /* glad.c */; };
 		4E6E0E6C273EDEB800A66F14 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E6E0E6B273EDEB800A66F14 /* libglfw.3.3.dylib */; };
 		4E6E0E6D273EDF2E00A66F14 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E6E0E69273EDDED00A66F14 /* OpenGL.framework */; platformFilter = maccatalyst; };
+		4EBDB91A27500CFD00439921 /* lineShader.fs in Sources */ = {isa = PBXBuildFile; fileRef = 4EBDB91927500CFD00439921 /* lineShader.fs */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,7 +43,7 @@
 		4E6E0DB8273EDD1700A66F14 /* standardShader.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = standardShader.vs; sourceTree = "<group>"; };
 		4E6E0DB9273EDD1700A66F14 /* skybox.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = skybox.fs; sourceTree = "<group>"; };
 		4E6E0DBA273EDD1700A66F14 /* Cube.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Cube.cpp; sourceTree = "<group>"; };
-		4E6E0DBB273EDD1700A66F14 /* cubeshader.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = cubeshader.vs; sourceTree = "<group>"; };
+		4E6E0DBB273EDD1700A66F14 /* lineShader.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = lineShader.vs; sourceTree = "<group>"; };
 		4E6E0DBC273EDD1700A66F14 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../LearnOpengl/main.cpp; sourceTree = "<group>"; };
 		4E6E0DBD273EDD1700A66F14 /* camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = camera.hpp; sourceTree = "<group>"; };
 		4E6E0DBE273EDD1700A66F14 /* glad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glad.c; sourceTree = "<group>"; };
@@ -189,6 +190,7 @@
 		4EBDB916274EC57E00439921 /* planeShader.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = planeShader.vs; sourceTree = "<group>"; };
 		4EBDB917274EC57E00439921 /* planeShader.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = planeShader.fs; sourceTree = "<group>"; };
 		4EBDB918274F413200439921 /* draw.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = draw.h; sourceTree = "<group>"; };
+		4EBDB91927500CFD00439921 /* lineShader.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = lineShader.fs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -232,7 +234,8 @@
 				4E6E0DB5273EDD1700A66F14 /* skybox.vs */,
 				4E6E0DB6273EDD1700A66F14 /* standardShader.fs */,
 				4E6E0DB8273EDD1700A66F14 /* standardShader.vs */,
-				4E6E0DBB273EDD1700A66F14 /* cubeshader.vs */,
+				4E6E0DBB273EDD1700A66F14 /* lineShader.vs */,
+				4EBDB91927500CFD00439921 /* lineShader.fs */,
 				4E6E0DB9273EDD1700A66F14 /* skybox.fs */,
 				4EBDB917274EC57E00439921 /* planeShader.fs */,
 				4EBDB916274EC57E00439921 /* planeShader.vs */,
@@ -677,6 +680,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4EBDB91A27500CFD00439921 /* lineShader.fs in Sources */,
 				4E6E0DC3273EDD1700A66F14 /* glad.c in Sources */,
 				4E6E0DC1273EDD1700A66F14 /* Cube.cpp in Sources */,
 				4E6E0DC2273EDD1700A66F14 /* main.cpp in Sources */,
