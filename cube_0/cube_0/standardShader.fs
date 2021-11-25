@@ -1,15 +1,16 @@
 #version 330 core
 
 // Interpolated values from the vertex shaders
-in vec3 fragmentColor;
-
+// in vec3 fragmentColor;
+// don't need color for nwo
 // Ouput data
-out vec3 color;
+out vec4 color;
 
 void main(){
 
     // Output color = color specified in the vertex shader,
     // interpolated between all 3 surrounding vertices
-    color = fragmentColor;
+    // color = fragmentColor;
+    color = vec4(1.0f, 0.5f, 0.2f, 1.0f);
 
 }

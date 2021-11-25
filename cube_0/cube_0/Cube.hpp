@@ -75,5 +75,6 @@ double getDistance(double distance_vector[3]);
 void createCube();
 void createRobot();
 void updateRobot();
+void renewIndicesVertices();
 bool theSame(Mass m1, Mass m2);
 #endif /* Cube_hpp */

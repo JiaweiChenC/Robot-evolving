@@ -28,6 +28,7 @@ float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 const int cube_num = 27;
 const int robot_num = 1;
+const int mass_num = 64;
 vector<Mass> masses;
 vector<Spring> springs;
 vector<int> imMasses;
@@ -39,14 +40,15 @@ double a = LENGTH;
 double b = 0.1;
 double c = 0.1;
 
-GLdouble myCube_vertex[cube_num * 24 * robot_num]; // cube_count * 8 points * 3 (x, y, z)
+GLdouble cubeVertices[mass_num * 3 * robot_num]; // cube_count * 8 points * 3 (x, y, z)
 GLdouble myCube_color[cube_num * 24 * robot_num]; // cube_count * 8 points * 3 bit
-GLuint myCubeindices[cube_num * 36 * robot_num];   // cube_count * 6 faces * 2 triangles * 3 indices
+GLuint cubeIndices[cube_num * 36 * robot_num];   // cube_count * 6 faces * 2 triangles * 3 indices
 GLdouble myEdge_color[cube_num * 24 * robot_num];      // cube_count * 8 points * 3 bit
 GLuint myEdge_indices[cube_num * 24 * robot_num]; // cube_count * 12 * 2
 GLdouble myShade_vertex[cube_num * 24 * robot_num];
 GLdouble myShade_color[cube_num * 24 * robot_num];
 GLuint myShadeindices[cube_num * 36 * robot_num];
+GLdouble springVertices[372 * 3 * 2];
 
 
 float skyboxVertices[] = {
@@ -105,43 +107,6 @@ float planeVertices[] = {
      5.0f, -0.5f, -5.0f,  2.0f, 2.0f
 };
 
-vector<vector<GLuint>> cubeIndices{
-    {0, 1},
-    {0, 2},
-    {0, 3},
-    {0, 4},
-    {0, 5},
-    {0, 6},
-    {0, 7},
-    
-    {1, 2},
-    {1, 3},
-    {1, 4},
-    {1, 5},
-    {1, 6},
-    {1, 7},
-    
-    {2, 3},
-    {2, 4},
-    {2, 5},
-    {2, 6},
-    {2, 7},
-    
-    {3, 4},
-    {3, 5},
-    {3, 6},
-    {3, 7},
-    
-    {4, 5},
-    {4, 6},
-    {4, 7},
-    
-    {5, 6},
-    {5, 7},
-    
-    {6, 7}
-};
-
 vector<vector<GLuint>> faceIndices{
     {0, 1, 2},
     {0, 2, 3},
@@ -168,13 +133,21 @@ vector<Spring> spring0 = generateSpring(5000);
 int main()
 {
     createRobot();
-//    for (const auto& i: imMasses){
-//        cout << "masses index: " << i << endl;
-//    }
-    for (const auto& mass: masses){
-        cout << "massPosition\n" << "x: " << mass.p[0] << "y: " << mass.p[1] <<"z: " <<  mass.p[2] << endl;
+    renewIndicesVertices();
+    for (const auto& i: imMasses){
+        cout << "masses index: " << i << endl;
     }
-    
+//    for (const auto& mass: masses){
+//        cout << "massPosition\n" << "x: " << mass.p[0] << "y: " << mass.p[1] <<"z: " <<  mass.p[2] << endl;
+//    }
+    for (const auto& i: cubeIndices) {
+        cout << "triangle indices: " << i << endl;
+    }
+    for (const auto& i: cubeVertices) {
+        cout << "vertices: " << i << endl;
+    }
+    cout << "vertices " << sizeof(cubeVertices) << endl;
+    cout << "num indices: " << sizeof(cubeIndices) << endl;
     cout << "number masses: " << masses.size() << endl;
     cout << "number springs: " << springs.size() << endl;
     cout <<"mass index: " << imMasses.size() << endl;
@@ -252,49 +225,38 @@ int main()
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glBindVertexArray(0);
-    planeShader.use();
-    planeShader.setInt("texture1", 0);
     
-    // draw cube stuff
-    GLuint vertexbufferCube;
-    glGenBuffers(1, &vertexbufferCube);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferCube);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(myCube_vertex), myCube_vertex, GL_DYNAMIC_DRAW);
-
-    GLuint colorbufferCube;
-    glGenBuffers(1, &colorbufferCube);
-    glBindBuffer(GL_ARRAY_BUFFER, colorbufferCube);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(myCube_color), myCube_color, GL_STATIC_DRAW);
-
-    GLuint colorbufferEdge;
-    glGenBuffers(1, &colorbufferEdge);
-    glBindBuffer(GL_ARRAY_BUFFER, colorbufferEdge);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(myEdge_color), myEdge_color, GL_STATIC_DRAW);
-
-    GLuint vertexbufferShade;
-    glGenBuffers(1, &vertexbufferShade);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferShade);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(myShade_vertex), myShade_vertex, GL_DYNAMIC_DRAW);
-
-    GLuint colorbufferShade;
-    glGenBuffers(1, &colorbufferShade);
-    glBindBuffer(GL_ARRAY_BUFFER, colorbufferShade);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(myShade_color), myShade_color, GL_STATIC_DRAW);
-
-    GLuint EBOCube;
-    glGenBuffers(1, &EBOCube);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOCube);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(myCubeindices), myCubeindices, GL_STATIC_DRAW);
-
-    GLuint EBOEdge;
-    glGenBuffers(1, &EBOEdge);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOEdge);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(myEdge_indices), myEdge_indices, GL_STATIC_DRAW);
+     //draw cube stuff
+    Shader cubeShader("cube_0/standardShader.vs", "cube_0/standardShader.fs");
+    unsigned int cubeVAO, cubeVBO, cubeEBO;
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &cubeVBO);
+    glGenBuffers(1, &cubeEBO);
+    glBindVertexArray(cubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
+    glEnableVertexAttribArray(0);
+//    Shader cubeShader("cube_0/standardShader.vs", "cube_0/standardShader.fs");
+//    unsigned int pointVAO, pointVBO;
+//    glGenVertexArrays(1, &pointVAO);
+//    glGenBuffers(1, &pointVBO);
+//    glBindVertexArray(pointVAO);
+//    glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+//    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
+//    glEnableVertexAttribArray(0);
+//    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//    glBindVertexArray(0);
+//    glEnableVertexAttribArray(1);
+//    glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0);
+    
     while (!glfwWindowShouldClose(window))
     {
         // input
         // -----
-        vector<float> point_vertices(0);
         //cubeUpdate(mass0, spring0, 1);
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -319,6 +281,7 @@ int main()
 
             glDepthFunc(GL_LESS);
             planeShader.use();
+            planeShader.setInt("texture1", 0);
             model = glm::mat4(1.0f);
             model = glm::translate(model, vec3(0.5, 1, 0.5));
             planeShader.setMat4("model",  model);
@@ -331,6 +294,21 @@ int main()
             
             model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1, 0, 0));
             model = glm::translate(model, vec3(-0.5, -0.5, -0.5));
+            
+//            glDepthFunc(GL_ALWAYS);
+//            cubeShader.use();
+//            cubeShader.setMat4("MVP", projection * view * model);
+//            glPointSize(15.0f);
+//            glBindVertexArray(pointVAO);
+//            glDrawArrays(GL_POINT, 0, 64);
+            // draw cube
+            glDepthFunc(GL_ALWAYS);
+            cubeShader.use();
+            cubeShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(cubeVAO);
+            glDrawElements(GL_TRIANGLES, 12 * 3 * 27, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
 //            for (int i=0; i < 28; i++){
 //                Line line(vec3(mass0[cubeIndices[i][0]].p), mass0[cubeIndices[i][1]].p);
 //                line.setMVP(projection * view * model);
@@ -355,13 +333,13 @@ int main()
 //                face.draw();
 //            }
             //updateRobot();
-            cout << masses.size() << endl;
-            for (int i = 0; i < masses.size(); i++) {
-                cout << "whathappend: " << i << endl;
-                point_vertices.push_back(masses[i].p[0]);
-                point_vertices.push_back(masses[i].p[1]);
-                point_vertices.push_back(masses[i].p[2]);
-            }
+//            cout << masses.size() << endl;
+//            for (int i = 0; i < masses.size(); i++) {
+//                cout << "whathappend: " << i << endl;
+//                point_vertices.push_back(masses[i].p[0]);
+//                point_vertices.push_back(masses[i].p[1]);
+//                point_vertices.push_back(masses[i].p[2]);
+//            }
 //            cout << sizeof(point_vertices) << endl;
 //            cout << sizeof(double) << endl;
 //            Point point;
@@ -375,7 +353,6 @@ int main()
 //                line.setColor(vec3(0, 0, 1));
 //                line.draw();
 //            }
-            
             glDepthFunc(GL_LEQUAL);
             skyboxShader.use();
             view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
@@ -391,7 +368,7 @@ int main()
             glfwPollEvents();
         }
     }
-
+    
     glfwTerminate();
     return 0;
 }
@@ -652,4 +629,101 @@ void updateRobot() {
         masses[i].p += masses[i].p * dt;
     }
     T += dt;
+}
+
+
+// renew indices!
+void renewIndicesVertices() {
+    for (int i = 0; i < DIM*DIM*DIM; i++) {
+        vector<int> tempCube(8);
+        vector<int> upper(0);
+        vector<int> down(0);
+        vector<int> front(0);
+        vector<int> back(0);
+        int right;
+        int left;
+        for (int j = 0; j < 8; j++) {
+            tempCube[j] = imMasses[8 * i + j];
+        }
+        for (int n = 0; n < 8; n++) {
+            if (masses[tempCube[n]].p.z == masses[tempCube[0]].p.z){
+                upper.push_back(tempCube[n]);
+            }
+            else {
+                down.push_back(tempCube[n]);
+            }
+        }
+        cout << upper[0]<<  endl;
+        // change position if wrong
+        if (masses[upper[0]].p.z < masses[down[0]].p.z) {
+            vector<int> temp = upper;
+            upper = down;
+            down = temp;
+        }
+        
+        for (int n = 0; n < 4; n++) {
+            if (masses[upper[n]].p.y == masses[upper[0]].p.y) {
+                front.push_back(upper[n]);
+            }
+            else {
+                back.push_back(upper[n]);
+            }
+        }
+        cout << "front: " << front.size() << endl;
+        cout << "back: " << back.size() << endl;
+        // change the position if wrong
+        if (masses[front[0]].p.y < masses[back[0]].p.y) {
+            vector<int> temp = front;
+            front = back;
+            back = temp;
+        }
+//
+        if (masses[front[0]].p.x > masses[front[1]].p.x) {
+            right = front[0];
+            left = front[1];
+        }
+        else {
+            right = front[1];
+            left = front[0];
+        }
+        tempCube[5] = right;
+        tempCube[6] = left;
+        for (int z = 0; z < 4; z++) {
+            if(masses[upper[z]].p.x == masses[right].p.x && masses[upper[z]].p.y < masses[right].p.y) {
+                tempCube[4] = upper[z];
+            }
+            if(masses[upper[z]].p.x < masses[right].p.x && masses[upper[z]].p.y < masses[right].p.y) {
+                tempCube[7] = upper[z];
+            }
+        }
+        for (int p = 0; p < 4; p++) {
+            if(masses[down[p]].p.x == masses[tempCube[4]].p.x && masses[down[p]].p.y == masses[tempCube[4]].p.y){
+                tempCube[0] = down[p];
+            }
+            if(masses[down[p]].p.x == masses[tempCube[5]].p.x && masses[down[p]].p.y == masses[tempCube[5]].p.y){
+                tempCube[1] = down[p];
+            }
+            if(masses[down[p]].p.x == masses[tempCube[6]].p.x && masses[down[p]].p.y == masses[tempCube[6]].p.y){
+                tempCube[2] = down[p];
+            }
+            if(masses[down[p]].p.x == masses[tempCube[7]].p.x && masses[down[p]].p.y == masses[tempCube[7]].p.y){
+                tempCube[3] = down[p];
+            }
+        }
+        for (int j = 0; j < 8; j++) {
+            imMasses[8 * i + j] = tempCube[j];
+        }
+        
+        for (int k = 0; k < 12; k++) {
+            cubeIndices[36 * i + 3 * k] = tempCube[faceIndices[k][0]];
+            cubeIndices[36 * i + 1 + 3 * k] = tempCube[faceIndices[k][1]];
+            cubeIndices[36 * i + 2 + 3 * k] = tempCube[faceIndices[k][2]];
+        }
+    }
+    
+    for (int i = 0; i < masses.size(); i++) {
+        for (int j = 0; j < 3; j++) {
+            cubeVertices[3 * i + j] = masses[i].p[j];
+        }
+    }
 }
