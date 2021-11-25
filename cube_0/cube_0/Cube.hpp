@@ -8,8 +8,6 @@
 #ifndef Cube_hpp
 #define Cube_hpp
 
-
-#endif /* Cube_hpp */
 #define GL_SILENCE_DEPRECATION 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,27 +20,27 @@
 #include <glm/gtc/matrix_transform.hpp>
 extern const double MASS;
 extern double LENGTH;
-extern double GRAVITY;
+extern glm::dvec3 GRAVITY;
 extern double SPRINGCONSTANT;
 extern double GROUNDCONSTANT;
 extern double FRICTION_COEF;
 extern double DAMPING;
 extern double T;
 extern double L0;
-extern int Dim;
-extern vector<Mass> masses;
-extern vector<Spring> springs;
-extern vector<int> imMasses;
-
-
+extern double dt;
+extern double mu;
+extern int springConstant;
+extern int DIM;
+extern double omega;
+extern double kGround;
 using namespace std;
 
 struct Mass
 {
     double m;           // mass
-    glm::vec3 p;       // positon x, y, z
-    glm::vec3 v;        // velocity x, y, z
-    glm::vec3 a;        // acceleration
+    glm::dvec3 p;       // positon x, y, z
+    glm::dvec3 v;        // velocity x, y, z
+    glm::dvec3 a;        // acceleration
 };
 
 struct Spring
@@ -52,9 +50,10 @@ struct Spring
     int m1;         // connected mass 1
     int m2;         // connected mass 2
     double a = LENGTH;
-    double b = 0.1;
-    double c = 0.1;
+    double b = 0;
+    double c = 0;
 };
+
 
 class Cube {
 public:
@@ -75,3 +74,6 @@ void cubeUpdate(vector<Mass>& cubeMass, vector<Spring>& cubeSpring, int mode);
 double getDistance(double distance_vector[3]);
 void createCube();
 void createRobot();
+void updateRobot();
+bool theSame(Mass m1, Mass m2);
+#endif /* Cube_hpp */

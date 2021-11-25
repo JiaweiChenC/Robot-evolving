@@ -1,20 +1,19 @@
 #include "Cube.hpp"
-double mass = 0.1;
+const double MASS = 0.1;
 double LENGTH = 0.1;
 double gravity = 9.81;
 double T = 0;
 double L0 = 0.1;
 double dt = 0.002;
-double restoreConstant = 10000;
-double springConstant = 5000;
-double DAMPING = 0.9;
-double frictionCoefficient = 0;//0.8;
+double mu = 0.8;
 int DIM = 3;
+double omega = 10;
+double restoreConstant = 10000;
+double kGround = 10000;
+int springConstant = 5000;
+double DAMPING = 0.9;
+glm::dvec3 GRAVITY = {0, 0, -9.8};
 using namespace std;
-
-vector<Mass> masses;
-vector<Spring> springs;
-vector<int> imMasses;
 
 vector<Mass> generateMass(double mass, double LENGTH, double initialX, double initialY, double initialZ)
 {
@@ -161,76 +160,3 @@ void cubeUpdate(std::vector<Mass>& mass_on_cube, std::vector<Spring>& cubeSpring
     // re-initilize energy variable
 }
 
-void createCube (double x, double y, double z) {
-    int n = (int)masses.size();
-    // int n2 = (int)springs.size();
-    // first create 8 masses
-    vector<Mass> tempMasses(8);
-    tempMasses[0] = {mass,{x+LENGTH/2,y+LENGTH/2,z},{0,0,0},{0,0,0}};
-    tempMasses[1] = {mass,{x+LENGTH/2,y-LENGTH/2,z},{0,0,0},{0,0,0}};
-    tempMasses[2] = {mass,{x-LENGTH/2,y-LENGTH/2,z},{0,0,0},{0,0,0}};
-    tempMasses[3] = {mass,{x-LENGTH/2,y+LENGTH/2,z},{0,0,0},{0,0,0}};
-    tempMasses[4] = {mass,{x+LENGTH/2,y+LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
-    tempMasses[5] = {mass,{x+LENGTH/2,y-LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
-    tempMasses[6] = {mass,{x-LENGTH/2,y-LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
-    tempMasses[7] = {mass,{x-LENGTH/2,y+LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
-    
-    // check the mass created if coinciding with the previous cube if is
-    // make m = 0 coinciding pushback the mass overlap, imMasses pushback
-    // record all the indices
-    vector<int> coinciding;
-    for (int j = 0; j < tempMasses.size(); j++) {
-        for (int i = 0; i < masses.size(); i++) {
-            if (theSame(tempMasses[j], masses[i])) {
-                tempMasses[j].m = 0;
-                coinciding.push_back(i);
-                imMasses.push_back(i);
-            }
-        }
-    }
-    
-    // pushback the not coinciding masses
-    int count = 0;
-    for (int i = 0; i < tempMasses.size(); i++) {
-        if(tempMasses[i].m != 0) {
-            masses.push_back(tempMasses[i]);
-            imMasses.push_back(n+count);
-            count++;
-        }
-    }
-    
-    // create springs, this is for the nonconinciding masses
-    for (int i = n; i < masses.size() - 1; i++) {
-        for (int j = i+1; j < masses.size(); j++) {
-            Spring s;
-            s.k = springConstant;
-            s.m1 = j;
-            s.m2 = i;
-            s.L = distance(masses[i].p, masses[j].p);
-            springs.push_back(s);
-        }
-    }
-    
-    // create springs, this is for the coinciding masses
-    for (int i = 0; i < coinciding.size(); i++) {
-        for (int j = n; j < masses.size(); j++) {
-            Spring s;
-            s.k = springConstant;
-            s.m1 = coinciding[i];
-            s.m2 = j;
-            s.L = distance(masses[s.m1].p, masses[s.m2].p);
-            springs.push_back(s);
-        }
-    }
-}
-
-// Robot is a set of cube
-void createRobot(){
-    for (int i = 0; i < DIM; i++){
-        for (int j = 0; j < DIM; j++){
-            for (int k = 0; k < DIM; k++){
-                createCube((double)(i)/10.0, (double)(j)/10.0, (double)(k)/10.0);
-            }
-        }
-    }
-}

@@ -1,7 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -9,7 +8,7 @@
 #include "camera.hpp"
 #include <iostream>
 #include "Cube.hpp"
-
+#include "draw.h"
 using namespace std;
 using namespace glm;
 const unsigned int SCR_WIDTH = 800;
@@ -27,312 +26,28 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
-
+const int cube_num = 27;
+const int robot_num = 1;
+vector<Mass> masses;
+vector<Spring> springs;
+vector<int> imMasses;
 // timing
 float deltaTime = 0.0f;    // time between current frame and last frame
 float lastFrame = 0.0f;
 // settings
+double a = LENGTH;
+double b = 0.1;
+double c = 0.1;
 
-class DrawFace {
-    int shaderProgram;
-    unsigned int VBO, VAO;
-    vector<float> vertices;
-    vec3 coord0;
-    vec3 coord1;
-    vec3 coord2;
-    mat4 MVP;
-    vec3 faceColor;
-public:
-    DrawFace(vec3 point0, vec3 point1, vec3 point2) {
-        coord0 = point0;
-        coord1 = point1;
-        coord2 = point2;
-        faceColor = vec3(1,1,1);
-        const char *vertexShaderSource = "#version 330 core\n"
-            "layout (location = 0) in vec3 aPos;\n"
-            "uniform mat4 MVP;\n"
-            "void main()\n"
-            "{\n"
-            "   gl_Position = MVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-            "}\0";
-        const char *fragmentShaderSource = "#version 330 core\n"
-            "out vec4 FragColor;\n"
-            "uniform vec3 color;\n"
-            "void main()\n"
-            "{\n"
-            "   FragColor = vec4(color, 1.0f);\n"
-            "}\n\0";
+GLdouble myCube_vertex[cube_num * 24 * robot_num]; // cube_count * 8 points * 3 (x, y, z)
+GLdouble myCube_color[cube_num * 24 * robot_num]; // cube_count * 8 points * 3 bit
+GLuint myCubeindices[cube_num * 36 * robot_num];   // cube_count * 6 faces * 2 triangles * 3 indices
+GLdouble myEdge_color[cube_num * 24 * robot_num];      // cube_count * 8 points * 3 bit
+GLuint myEdge_indices[cube_num * 24 * robot_num]; // cube_count * 12 * 2
+GLdouble myShade_vertex[cube_num * 24 * robot_num];
+GLdouble myShade_color[cube_num * 24 * robot_num];
+GLuint myShadeindices[cube_num * 36 * robot_num];
 
-        // vertex shader
-        int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-        glCompileShader(vertexShader);
-        // check for shader compile errors
-
-        // fragment shader
-        int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-        glCompileShader(fragmentShader);
-        // check for shader compile errors
-
-        // link shaders
-        shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glLinkProgram(shaderProgram);
-        // check for linking errors
-
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-
-        float vertices[] = {
-             coord0.x, coord0.y, coord0.z,
-             coord1.x, coord1.y, coord1.z,
-             coord2.x, coord2.y, coord2.z,
-        };
-        
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-        glBindVertexArray(VAO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-
-    }
-
-    int setMVP(mat4 mvp) {
-        MVP = mvp;
-        return 0;
-    }
-
-    int setColor(vec3 color) {
-        faceColor = color;
-        return 0;
-    }
-
-    int draw() {
-        glUseProgram(shaderProgram);
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &MVP[0][0]);
-        glUniform3fv(glGetUniformLocation(shaderProgram, "color"), 1, &faceColor[0]);
-
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDeleteVertexArrays(1, &VAO);
-        glDeleteBuffers(1, &VBO);
-        glDeleteProgram(shaderProgram);
-        return 0;
-    }
-    ~DrawFace() {
-        glDeleteVertexArrays(1, &VAO);
-        glDeleteBuffers(1, &VBO);
-        glDeleteProgram(shaderProgram);
-    }
-};
-class Point {
-    int shaderProgram;
-    unsigned int VBO, VAO;
-    vector<float> vertices;
-    vec3 coord;
-    mat4 MVP;
-    vec3 pointColor;
-public:
-    Point(vec3 pointCoord) {
-        coord = pointCoord;
-        pointColor = vec3(1,1,1);
-        const char *vertexShaderSource = "#version 330 core\n"
-            "layout (location = 0) in vec3 aPos;\n"
-            "uniform mat4 MVP;\n"
-            "void main()\n"
-            "{\n"
-            "   gl_Position = MVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-            "}\0";
-        const char *fragmentShaderSource = "#version 330 core\n"
-            "out vec4 FragColor;\n"
-            "uniform vec3 color;\n"
-            "void main()\n"
-            "{\n"
-            "   FragColor = vec4(color, 1.0f);\n"
-            "}\n\0";
-
-        // vertex shader
-        int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-        glCompileShader(vertexShader);
-        // check for shader compile errors
-
-        // fragment shader
-        int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-        glCompileShader(fragmentShader);
-        // check for shader compile errors
-
-        // link shaders
-        shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glLinkProgram(shaderProgram);
-        // check for linking errors
-
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-
-        vertices = {
-             coord.x, coord.y, coord.z,
-        };
-        
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-        glBindVertexArray(VAO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_DYNAMIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-
-    }
-
-    int setMVP(mat4 mvp) {
-        MVP = mvp;
-        return 0;
-    }
-
-    int setColor(vec3 color) {
-        pointColor = color;
-        return 0;
-    }
-
-    int draw() {
-        glUseProgram(shaderProgram);
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &MVP[0][0]);
-        glUniform3fv(glGetUniformLocation(shaderProgram, "color"), 1, &pointColor[0]);
-
-        glBindVertexArray(VAO);
-        glPointSize(15.0f);
-        glDrawArrays(GL_POINTS, 0, 1);
-        glDeleteVertexArrays(1, &VAO);
-        glDeleteBuffers(1, &VBO);
-        glDeleteProgram(shaderProgram);
-        return 0;
-    }
-    ~Point() {
-        glDeleteVertexArrays(1, &VAO);
-        glDeleteBuffers(1, &VBO);
-        glDeleteProgram(shaderProgram);
-    }
-};
-class Line {
-    int shaderProgram;
-    unsigned int VBO, VAO;
-    vector<float> vertices;
-    vec3 startPoint;
-    vec3 endPoint;
-    mat4 MVP;
-    vec3 lineColor;
-public:
-    Line(vec3 start, vec3 end) {
-
-        startPoint = start;
-        endPoint = end;
-        lineColor = vec3(1,1,1);
-
-        const char *vertexShaderSource = "#version 330 core\n"
-            "layout (location = 0) in vec3 aPos;\n"
-            "uniform mat4 MVP;\n"
-            "void main()\n"
-            "{\n"
-            "   gl_Position = MVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-            "}\0";
-        const char *fragmentShaderSource = "#version 330 core\n"
-            "out vec4 FragColor;\n"
-            "uniform vec3 color;\n"
-            "void main()\n"
-            "{\n"
-            "   FragColor = vec4(color, 1.0f);\n"
-            "}\n\0";
-
-        // vertex shader
-        int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-        glCompileShader(vertexShader);
-        // check for shader compile errors
-
-        // fragment shader
-        int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-        glCompileShader(fragmentShader);
-        // check for shader compile errors
-
-        // link shaders
-        shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glLinkProgram(shaderProgram);
-        // check for linking errors
-
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-
-        vertices = {
-             start.x, start.y, start.z,
-             end.x, end.y, end.z,
-
-        };
-        
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-        glBindVertexArray(VAO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_DYNAMIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-
-    }
-
-    int setMVP(mat4 mvp) {
-        MVP = mvp;
-        return 0;
-    }
-
-    int setColor(vec3 color) {
-        lineColor = color;
-        return 0;
-    }
-
-    int draw() {
-        glUseProgram(shaderProgram);
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &MVP[0][0]);
-        glUniform3fv(glGetUniformLocation(shaderProgram, "color"), 1, &lineColor[0]);
-
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_LINES, 0, 2);
-        glDeleteVertexArrays(1, &VAO);
-        glDeleteBuffers(1, &VBO);
-        glDeleteProgram(shaderProgram);
-        return 0;
-    }
-
-    ~Line() {
-
-        glDeleteVertexArrays(1, &VAO);
-        glDeleteBuffers(1, &VBO);
-        glDeleteProgram(shaderProgram);
-    }
-};
 
 float skyboxVertices[] = {
     // positions
@@ -452,10 +167,18 @@ vector<Spring> spring0 = generateSpring(5000);
 
 int main()
 {
-    createCube();
-    for (const auto& i: imMasses){
-        cout << "masses index: " << i << endl;
+    createRobot();
+//    for (const auto& i: imMasses){
+//        cout << "masses index: " << i << endl;
+//    }
+    for (const auto& mass: masses){
+        cout << "massPosition\n" << "x: " << mass.p[0] << "y: " << mass.p[1] <<"z: " <<  mass.p[2] << endl;
     }
+    
+    cout << "number masses: " << masses.size() << endl;
+    cout << "number springs: " << springs.size() << endl;
+    cout <<"mass index: " << imMasses.size() << endl;
+    
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -531,12 +254,48 @@ int main()
     glBindVertexArray(0);
     planeShader.use();
     planeShader.setInt("texture1", 0);
+    
+    // draw cube stuff
+    GLuint vertexbufferCube;
+    glGenBuffers(1, &vertexbufferCube);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferCube);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(myCube_vertex), myCube_vertex, GL_DYNAMIC_DRAW);
 
+    GLuint colorbufferCube;
+    glGenBuffers(1, &colorbufferCube);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbufferCube);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(myCube_color), myCube_color, GL_STATIC_DRAW);
+
+    GLuint colorbufferEdge;
+    glGenBuffers(1, &colorbufferEdge);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbufferEdge);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(myEdge_color), myEdge_color, GL_STATIC_DRAW);
+
+    GLuint vertexbufferShade;
+    glGenBuffers(1, &vertexbufferShade);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferShade);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(myShade_vertex), myShade_vertex, GL_DYNAMIC_DRAW);
+
+    GLuint colorbufferShade;
+    glGenBuffers(1, &colorbufferShade);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbufferShade);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(myShade_color), myShade_color, GL_STATIC_DRAW);
+
+    GLuint EBOCube;
+    glGenBuffers(1, &EBOCube);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOCube);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(myCubeindices), myCubeindices, GL_STATIC_DRAW);
+
+    GLuint EBOEdge;
+    glGenBuffers(1, &EBOEdge);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOEdge);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(myEdge_indices), myEdge_indices, GL_STATIC_DRAW);
     while (!glfwWindowShouldClose(window))
     {
         // input
         // -----
-        cubeUpdate(mass0, spring0, 1);
+        vector<float> point_vertices(0);
+        //cubeUpdate(mass0, spring0, 1);
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -552,11 +311,11 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 0.0f);
         
-        if ( (int)(T * 10000) % 10  == 0){
+        if (true){
         // draw line
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            std::cout << T << endl;
+            // std::cout << "Global Time now: " << T << endl;
 
             glDepthFunc(GL_LESS);
             planeShader.use();
@@ -572,29 +331,50 @@ int main()
             
             model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1, 0, 0));
             model = glm::translate(model, vec3(-0.5, -0.5, -0.5));
-            glDepthFunc(GL_ALWAYS);
 //            for (int i=0; i < 28; i++){
 //                Line line(vec3(mass0[cubeIndices[i][0]].p), mass0[cubeIndices[i][1]].p);
+//                line.setMVP(projection * view * model);
+//                line.setColor(vec3(0, 0, 1));
+//                line.draw();
+//            }
+            
+//            for (int i=0; i < 8; i++){
+//                Point point(vec3(mass0[i].p));
+//                point.setMVP(projection * view * model);
+//                point.setColor(vec3(0, 1, 0));
+//                if (mass0[i].p[2] < 0.01){
+//                    point.setColor(vec3(0.1, 0.9, 0.2));
+//                }
+//                point.draw();
+//            }
+//
+//            for (int i = 0; i < 12; i++) {
+//                DrawFace face(mass0[faceIndices[i][0]].p, mass0[faceIndices[i][1]].p, mass0[faceIndices[i][2]].p);
+//                face.setMVP(projection * view * model);
+//                face.setColor(vec3(0.9, 0.4, 0.9));
+//                face.draw();
+//            }
+            //updateRobot();
+            cout << masses.size() << endl;
+            for (int i = 0; i < masses.size(); i++) {
+                cout << "whathappend: " << i << endl;
+                point_vertices.push_back(masses[i].p[0]);
+                point_vertices.push_back(masses[i].p[1]);
+                point_vertices.push_back(masses[i].p[2]);
+            }
+//            cout << sizeof(point_vertices) << endl;
+//            cout << sizeof(double) << endl;
+//            Point point;
+//            point.setMVP(projection * view * model);
+//            point.setColor(vec3(0.4, 0.4, 0.9));
+//            point.draw();
+            
+//            for (int i = 0; i < springs.size(); i++) {
+//                Line line(vec3(masses[springs[i].m1].p), vec3(masses[springs[i].m2].p));
 //                line.setMVP(projection * view * model);
 //                line.setColor(vec3(0, 0, 1));
 //                line.draw();
 //            }
-            
-            for (int i=0; i < 8; i++){
-                Point point(vec3(mass0[i].p));
-                point.setMVP(projection * view * model);
-                point.setColor(vec3(0, 1, 0));
-                if (mass0[i].p[2] < 0.01){
-                    point.setColor(vec3(0.1, 0.9, 0.2));
-                }
-                point.draw();
-            }
-            for (int i = 0; i < 12; i++) {
-                DrawFace face(mass0[faceIndices[i][0]].p, mass0[faceIndices[i][1]].p, mass0[faceIndices[i][2]].p);
-                face.setMVP(projection * view * model);
-                face.setColor(vec3(0.9, 0.4, 0.9));
-                face.draw();
-            }
             
             glDepthFunc(GL_LEQUAL);
             skyboxShader.use();
@@ -610,55 +390,12 @@ int main()
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
-//        cout << "GLOBAL TIME: " <<  T  << endl;
-//        cout << "At HEIGHT: " << mass0[0].p[2] << endl;
-//        cout << "Velocity" << mass0[0].v[2] << endl;
-        // bind textures on corresponding texture units
-        
-        // render container
-
-
-        // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
-        
-        // draw box
-        // glBindVertexArray(cubeVAO);
-        // ourShader.setMat4("model", model);
-        // change depth function so depth test passes when values are equal to depth buffer's content
-        //skybox cube
-//        glDepthFunc(GL_LEQUAL);
-//        skyboxShader.use();
-//        view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
-//        skyboxShader.setMat4("view", view);
-//        skyboxShader.setMat4("projection", projection);
-//        glBindVertexArray(skyboxVAO);
-//        glActiveTexture(GL_TEXTURE0);
-//        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-//        glDrawArrays(GL_TRIANGLES, 0, 36);
-//        glBindVertexArray(0);
-//        glDepthFunc(GL_LESS); // set depth function back to default
-//        glfwSwapBuffers(window);
-//        glfwPollEvents();
     }
 
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-
-
-    // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-
-
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -787,5 +524,132 @@ unsigned int loadCubemap(vector<std::string> faces)
 }
 
 
+void createCube (double x, double y, double z) {
+    int n = (int)masses.size();
+    // int n2 = (int)springs.size();
+    // first create 8 masses
+    vector<Mass> tempMasses(8);
+    tempMasses[0] = {MASS,{x+LENGTH/2,y+LENGTH/2,z},{0,0,0},{0,0,0}};
+    tempMasses[1] = {MASS,{x+LENGTH/2,y-LENGTH/2,z},{0,0,0},{0,0,0}};
+    tempMasses[2] = {MASS,{x-LENGTH/2,y-LENGTH/2,z},{0,0,0},{0,0,0}};
+    tempMasses[3] = {MASS,{x-LENGTH/2,y+LENGTH/2,z},{0,0,0},{0,0,0}};
+    tempMasses[4] = {MASS,{x+LENGTH/2,y+LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
+    tempMasses[5] = {MASS,{x+LENGTH/2,y-LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
+    tempMasses[6] = {MASS,{x-LENGTH/2,y-LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
+    tempMasses[7] = {MASS,{x-LENGTH/2,y+LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
+    
+    // check the mass created if coinciding with the previous cube if is
+    // make m = 0 coinciding pushback the mass overlap, imMasses pushback
+    // record all the indices
+    vector<int> coinciding;
+    for (int j = 0; j < tempMasses.size(); j++) {
+        for (int i = 0; i < masses.size(); i++) {
+            if (theSame(tempMasses[j], masses[i])) {
+                tempMasses[j].m = 0;
+                coinciding.push_back(i);
+                imMasses.push_back(i);
+            }
+        }
+    }
+    
+    // pushback the not coinciding masses
+    int count = 0;
+    for (int i = 0; i < tempMasses.size(); i++) {
+        if(tempMasses[i].m != 0) {
+            masses.push_back(tempMasses[i]);
+            imMasses.push_back(n+count);
+            count++;
+        }
+    }
+    
+    // create springs, this is for the nonconinciding masses
+    for (int i = n; i < masses.size() - 1; i++) {
+        for (int j = i+1; j < masses.size(); j++) {
+            Spring s;
+            s.k = springConstant;
+            s.m1 = j;
+            s.m2 = i;
+            s.L = distance(masses[i].p, masses[j].p);
+            springs.push_back(s);
+        }
+    }
+    
+    // create springs, this is for the coinciding masses
+    for (int i = 0; i < coinciding.size(); i++) {
+        for (int j = n; j < masses.size(); j++) {
+            Spring s;
+            s.k = springConstant;
+            s.m1 = coinciding[i];
+            s.m2 = j;
+            s.L = distance(masses[s.m1].p, masses[s.m2].p);
+            springs.push_back(s);
+        }
+    }
+}
 
 
+// Robot is a set of cube
+void createRobot(){
+    for (int i = 0; i < DIM; i++){
+        for (int j = 0; j < DIM; j++){
+            for (int k = 0; k < DIM; k++){
+                createCube((double)(i)/10.0, (double)(j)/10.0, (double)(k)/10.0);
+            }
+        }
+    }
+}
+
+void updateRobot() {
+    for (int i = 0; i < springs.size(); i++) {
+        if (i % 8 == 0) {
+            springs[i].a = a;
+            springs[i].b = b;
+            springs[i].c = c;
+        }
+        springs[i].L = springs[i].a + springs[i].b*sin(T*omega + springs[i].c);
+    }
+    
+    for (int i = 0; i < masses.size(); i++) {
+        glm::dvec3 currentForce(0.0);
+        double F_c = 0;
+        double F_h = 0;
+        double F_v = 0;
+        
+        // force from the ground, including F_c and friction
+        if (masses[i].p[2] < 0) {
+            F_c = -kGround * masses[i].p[2] + GRAVITY.z * MASS;
+            currentForce.z = currentForce.z + F_c;
+            F_h = sqrt(pow(currentForce.x, 2) +  pow(currentForce.y, 2));
+            F_v = currentForce.z;
+            if (F_h < mu * F_v) {
+                masses[i].p[0] = 0;
+                masses[i].p[1] = 0;
+            }
+            else {
+                currentForce.x = currentForce.x - F_v * mu;
+                currentForce.y = currentForce.y - F_v * mu;
+            }
+        }
+        for (int j = 0; j < springs.size(); j++) {
+            if(springs[j].m1 == i || springs[j].m2 == i) {
+                glm::dvec3 springForce(0.0);
+                double currentLength = distance(masses[springs[j].m1].p, masses[springs[j].m2].p);
+                double F = springs[j].k * (currentLength - LENGTH);
+                if(springs[j].m1!=i) {
+                    springForce = F * (masses[springs[j].m1].p - masses[springs[j].m2].p)/currentLength;
+                }
+                else {
+                    springForce = F * (masses[springs[j].m2].p - masses[springs[j].m1].p)/currentLength;
+                }
+                currentForce = currentForce + springForce;
+            }
+        }
+        
+        currentForce.z = currentForce.z + GRAVITY.z * MASS;
+        masses[i].v *= DAMPING;
+        masses[i].a = currentForce/MASS;
+        masses[i].v += masses[i].a * dt;
+        masses[i].p += masses[i].p * dt;
+    }
+    T += dt;
+}
