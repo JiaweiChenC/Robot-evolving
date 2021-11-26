@@ -150,7 +150,7 @@ vector<Spring> spring0 = generateSpring(5000);
 
 int main()
 {
-    createRobot();
+    createRobot(0, 0, 0.1);
     someStuffToMakesuretheDrawingWroking();
     for (const auto& edge: myEdge_indices) {
         cout << "edge: " << edge << endl;
@@ -314,7 +314,7 @@ int main()
         
         if (true){
         // draw line
-            //updateRobot();
+            updateRobot();
             updateVertices();
             cout << "global Time Now: " << T <<  endl;
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -350,17 +350,18 @@ int main()
             glBindVertexArray(cubeVAO);
             glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
             glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
-            glDrawElements(GL_TRIANGLES, 12 * 3 * 27, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glDrawElements(GL_TRIANGLES, 12 * 3 * cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
             
             glDepthFunc(GL_ALWAYS);
+            glEnable(GL_LINE_SMOOTH);
             edgeShader.use();
             edgeShader.setMat4("MVP", projection * view * model);
             glBindVertexArray(edgeVAO);
             glBindBuffer(GL_ARRAY_BUFFER, edgeVBO);
             glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
-            glDrawElements(GL_LINES, 12 * 2 * 27, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glDrawElements(GL_LINES, 12 * 2 * cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
             
@@ -408,7 +409,7 @@ int main()
 //                line.setColor(vec3(0, 0, 1));
 //                line.draw();
 //            }
-            glDepthFunc(GL_LEQUAL);
+            glDepthFunc(GL_EQUAL);
             skyboxShader.use();
             view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
             skyboxShader.setMat4("view", view);
@@ -622,77 +623,76 @@ void createCube (double x, double y, double z) {
 
 
 // Robot is a set of cube
-void createRobot(){
+void createRobot(double x, double y, double z){
     for (int i = 0; i < DIM; i++){
         for (int j = 0; j < DIM; j++){
             for (int k = 0; k < DIM; k++){
-                createCube((double)(i)/10.0, (double)(j)/10.0, (double)(k)/10.0);
+                createCube((double)(i)/10.0 + x, (double)(j)/10.0 + y, (double)(k)/10.0 + z);
             }
         }
     }
 }
 
-//void updateRobot() {
-////    for (int i = 0; i < springs.size(); i++) {
-////        if (i % 8 == 0) {
-////            springs[i].a = a;
-////            springs[i].b = b;
-////            springs[i].c = c;
-////            springs[i].L0 = springs[i].a + springs[i].b*sin(T*omega + springs[i].c);
-////        }
-////    }
-////
-//    for (int i = 0; i < masses.size(); i++) {
-//        glm::dvec3 currentForce(0.0);
-//        double F_c = 0;
-//        double F_h = 0;
-//        double F_v = 0;
-//        for (const Spring spring: springs) {
-////            cout << "springLength: " << spring.L0 << endl;
-//            if(spring.m1 == i || spring.m2 == i) {
-////                cout << springs[i].m1 << " " << springs[i].m2 << endl;
-//                glm::dvec3 springForce(0.0);
-//                glm::dvec3 direction(0.0);
-//                direction = glm::normalize(masses[spring.m2].p - masses[spring.m1].p);
-//                double currentLength = distance(masses[spring.m1].p, masses[spring.m2].p);
-////                cout <<"current Length: " << currentLength <<  endl;
-//                double F = spring.k * (currentLength - spring.L0);
-////                cout << "current f" << F << endl;
-////                cout << "direction " << direction.x << endl;
-//                if(spring.m1 == i) {
-//                    springForce = F * direction;
-//                }
-//                else {
-//                    springForce = -F * direction;
-//                }
-//                currentForce += + springForce;
-//            }
+void updateRobot() {
+//    for (int i = 0; i < springs.size(); i++) {
+//        if (i % 8 == 0) {
+//            springs[i].a = a;
+//            springs[i].b = b;
+//            springs[i].c = c;
+//            springs[i].L0 = springs[i].a + springs[i].b*sin(T*omega + springs[i].c);
 //        }
-//        if (masses[i].p[2] < 0) {
-//            F_c = -kGround * masses[i].p[2];
-//            cout << "fc" << F_c << endl;
-//            currentForce.z = currentForce.z + F_c;
-//            F_h = sqrt(pow(currentForce.x, 2) +  pow(currentForce.y, 2));
-//            F_v = currentForce.z;
-//            if (F_h < mu * F_v) {
-//                masses[i].p[0] = 0;
-//                masses[i].p[1] = 0;
-//            }
-//            else {
-//                currentForce.x = currentForce.x - F_v * mu;
-//                currentForce.y = currentForce.y - F_v * mu;
-//            }
-//        }
-//
-//        currentForce.z = currentForce.z + GRAVITY.z * MASS;
-//        masses[i].v *= DAMPING;
-//        cout << "velocity: "<< masses[i].v[0] << endl;
-//        masses[i].a = currentForce/MASS;
-//        masses[i].v += masses[i].a * dt;
-//        masses[i].p += masses[i].v * dt;
 //    }
-//    T += dt;
-//}
+//
+    for (int i = 0; i < masses.size(); i++) {
+        glm::dvec3 currentForce(0.0);
+        double F_c = 0;
+        double F_h = 0;
+        double F_v = 0;
+        for (const Spring spring: springs) {
+//            cout << "springLength: " << spring.L0 << endl;
+            if(spring.m1 == i || spring.m2 == i) {
+//                cout << springs[i].m1 << " " << springs[i].m2 << endl;
+                glm::dvec3 springForce(0.0);
+                glm::dvec3 direction(0.0);
+                direction = glm::normalize(masses[spring.m2].p - masses[spring.m1].p);
+                double currentLength = distance(masses[spring.m1].p, masses[spring.m2].p);
+//                cout <<"current Length: " << currentLength <<  endl;
+                double F = spring.k * (currentLength - spring.L0);
+//                cout << "current f" << F << endl;
+//                cout << "direction " << direction.x << endl;
+                if(spring.m1 == i) {
+                    springForce = F * direction;
+                }
+                else {
+                    springForce = -F * direction;
+                }
+                currentForce += + springForce;
+            }
+        }
+        currentForce.z = currentForce.z + GRAVITY.z * MASS;
+        if (masses[i].p[2] < 0) {
+            F_c = -kGround * masses[i].p[2];
+            cout << "fc" << F_c << endl;
+            currentForce.z = currentForce.z + F_c;
+            F_h = sqrt(pow(currentForce.x, 2) +  pow(currentForce.y, 2));
+            F_v = currentForce.z;
+            if (F_h < mu * F_v) {
+                masses[i].p[0] = 0;
+                masses[i].p[1] = 0;
+            }
+            else {
+                currentForce.x = currentForce.x - F_v * mu;
+                currentForce.y = currentForce.y - F_v * mu;
+            }
+        }
+
+        masses[i].v *= DAMPING;
+        masses[i].a = currentForce/MASS;
+        masses[i].v += masses[i].a * dt;
+        masses[i].p += masses[i].v * dt;
+    }
+    T += dt;
+}
 
 
 // renew indices!

@@ -37,7 +37,7 @@ using namespace std;
 
 struct Mass
 {
-    double m;           // mass
+    double m = MASS;           // mass
     glm::dvec3 p;       // positon x, y, z
     glm::dvec3 v;        // velocity x, y, z
     glm::dvec3 a;        // acceleration
@@ -49,12 +49,16 @@ struct Spring
     double L0;      // original length
     int m1;         // connected mass 1
     int m2;         // connected mass 2
-    double a = L0;
-    double b = 0;
-    double c = 0;
+    double a = 0.1;
+    double b = 0.1;
+    double c = 0.1;
 };
 
-
+struct Force {
+    double x;
+    double y;
+    double z;
+};
 class Cube {
 public:
     int index;
@@ -73,9 +77,11 @@ vector<Spring> generateSpring(double springConstant);
 void cubeUpdate(vector<Mass>& cubeMass, vector<Spring>& cubeSpring, int mode);
 double getDistance(double distance_vector[3]);
 void createCube();
-void createRobot();
+void createRobot(double x, double y, double z);
 void updateRobot();
 void updateVertices();
 void someStuffToMakesuretheDrawingWroking();
 bool theSame(Mass m1, Mass m2);
+double distance(Mass m1, Mass m2);
+void animate();
 #endif /* Cube_hpp */
