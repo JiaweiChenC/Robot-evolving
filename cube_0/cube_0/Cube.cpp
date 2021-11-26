@@ -16,6 +16,7 @@ double DAMPING = 1;
 const double mutatePro = 0.1;
 const double crossPro = 0.4;
 const double selectPressure = 0.6;
+extern bool animation;
 bool evolution = true;
 glm::dvec3 GRAVITY = {0, 0, -9.8};
 extern GLdouble cubeVertices[]; // cube_count * 8 points * 3 (x, y, z)
@@ -143,7 +144,7 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
                 down.push_back(tempCube[n]);
             }
         }
-        cout << upper[0]<<  endl;
+//        cout << upper[0]<<  endl;
         // change position if wrong
         if (masses[upper[0]].p.z < masses[down[0]].p.z) {
             vector<int> temp = upper;
@@ -225,19 +226,36 @@ void Robot::updateVertices() {
 }
 
 void Robot::breathing() {
+//    for (int i = 0; i < springs.size(); i++) {
+//        // choose 0, 2, 6, 8, 13 as motor cube
+//        springs[i].k = gene.k[i];
+//    }
+//    for (int i = 0; i < 9; i++){
+//            for (int j = 0; j < 20; j++) {
+//                springs[20 * i + j].b = gene.b[i];
+//                springs[20 * i + j].c = gene.c[i];
+//            }
+//    }
+    for (int i = 0; i < 180; i++) {
+    springs[i].L0 = springs[i].a + springs[i].b * sin(10 * T + springs[i].c);
+    }
+}
+
+void Robot::updateSprings() {
     for (int i = 0; i < springs.size(); i++) {
         // choose 0, 2, 6, 8, 13 as motor cube
-        if (i  < 180) {
-            springs[i].L0 = springs[i].a + springs[i].b * sin(10 * T + springs[i].c);
-            cout <<"springLength: " << springs[i].L0 << endl;
-            cout << "a: " << springs[i].a << endl;
-        }
+        springs[i].k = gene.k[i];
+    }
+    for (int i = 0; i < 9; i++){
+            for (int j = 0; j < 20; j++) {
+                springs[20 * i + j].b = gene.b[i];
+                springs[20 * i + j].c = gene.c[i];
+            }
     }
 }
 
 void Robot::updateRobot() {
     for (int i = 0; i < masses.size(); i++) {
-        
         masses[i].force = {0, 0, 0};
         glm::dvec3 springForce(0.0);
         glm::dvec3 springDirection(0.0);
@@ -276,6 +294,20 @@ void Robot::updateRobot() {
     T+= dt;
 }
 
+void Robot::runningSimulate(double runningTime) {
+    updateSprings();
+    double runTime = 0;
+    double dtime = 0.001;
+    while (runTime < runningTime) {
+        breathing();
+        updateRobot();
+        runTime += dtime;
+    }
+    setDistance();
+    double dist = getDistance();
+    std::cout << "distance running: " << dist << endl;
+}
+
 bool Robot::theSame(Mass m1, Mass m2){
     if (distance(m1.p, m2.p) < 0.00001){
         return true;
@@ -293,8 +325,12 @@ glm::dvec3 Robot::getPosition() {
 }
 
 double Robot::getDistance() {
-    moveDistance = glm::distance(currentPos, startPos);
     return  moveDistance;
+}
+
+void Robot::setDistance() {
+    currentPos = getPosition();
+    moveDistance = glm::distance(currentPos, startPos);
 }
 
 vector<Robot> generateRobotGroup(int robotNum) {
@@ -432,6 +468,9 @@ vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotRetur
         crossoverRobot(robotGroup);
         selection(robotGroup);
         diversity = getDiversity(robotGroup);
+        for (Robot& robot: robotGroup) {
+            
+        }
     }
     for (int i = 0; i < robotReturn; i++ ) {
         returnRobot.push_back(robotGroup[i]);

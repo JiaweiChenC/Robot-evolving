@@ -29,7 +29,7 @@ bool firstMouse = true;
 const int cube_num = 27;
 const int robot_num = 1;
 const int mass_num = 64;
-bool animation = false;
+
 // timing
 float deltaTime = 0.0f;    // time between current frame and last frame
 float lastFrame = 0.0f;
@@ -37,6 +37,10 @@ float lastFrame = 0.0f;
 double a = LENGTH;
 double b = 0.1;
 double c = 0.1;
+
+
+bool animation = false;
+
 
 GLdouble cubeVertices[mass_num * 3 * robot_num]; // cube_count * 64 points * 3 (x, y, z)
 //GLdouble cubeColor[mass_num * 3 * robot_num]; // cube_count * 64 points * 3 bit
@@ -225,9 +229,12 @@ int main()
 {
     Robot robot0(0, 0, 0.01);
     robot0.someStuffToMakesuretheDrawingWroking();
+    robot0.runningSimulate(2);
     
     // glfw: initialize and configure
     // ------------------------------
+    
+    if (animation){
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -358,11 +365,12 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 0.0f);
         
-        if (animation){
-            robot0.updateRobot();
-            robot0.updateVertices();
-            robot0.getPosition();
-            robot0.breathing();
+        if (true){
+//            robot0.updateRobot();
+//            robot0.updateVertices();
+//            robot0.getPosition();
+//            robot0.breathing();
+            robot0.runningSimulate(2);
             cout << "at" << robot0.getPosition().x << endl;
             cout <<"travel distance" << robot0.getDistance() << endl;
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -427,6 +435,7 @@ int main()
     
     glfwTerminate();
     return 0;
+}
 }
 
 void processInput(GLFWwindow *window)

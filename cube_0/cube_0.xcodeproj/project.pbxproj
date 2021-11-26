@@ -13,7 +13,6 @@
 		4E6E0E6C273EDEB800A66F14 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E6E0E6B273EDEB800A66F14 /* libglfw.3.3.dylib */; };
 		4E6E0E6D273EDF2E00A66F14 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E6E0E69273EDDED00A66F14 /* OpenGL.framework */; platformFilter = maccatalyst; };
 		4EBDB91A27500CFD00439921 /* lineShader.fs in Sources */ = {isa = PBXBuildFile; fileRef = 4EBDB91927500CFD00439921 /* lineShader.fs */; };
-		4EBDB91D2750AE3400439921 /* ea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4EBDB91B2750AE3300439921 /* ea.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -192,8 +191,6 @@
 		4EBDB917274EC57E00439921 /* planeShader.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = planeShader.fs; sourceTree = "<group>"; };
 		4EBDB918274F413200439921 /* draw.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = draw.h; sourceTree = "<group>"; };
 		4EBDB91927500CFD00439921 /* lineShader.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = lineShader.fs; sourceTree = "<group>"; };
-		4EBDB91B2750AE3300439921 /* ea.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ea.cpp; sourceTree = "<group>"; };
-		4EBDB91C2750AE3300439921 /* ea.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ea.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -245,8 +242,6 @@
 				4E6E0DB4273EDD1700A66F14 /* Cube.hpp */,
 				4E6E0DBA273EDD1700A66F14 /* Cube.cpp */,
 				4E6E0DBC273EDD1700A66F14 /* main.cpp */,
-				4EBDB91C2750AE3300439921 /* ea.hpp */,
-				4EBDB91B2750AE3300439921 /* ea.cpp */,
 				4EBDB918274F413200439921 /* draw.h */,
 			);
 			path = cube_0;
@@ -685,7 +680,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4EBDB91D2750AE3400439921 /* ea.cpp in Sources */,
 				4EBDB91A27500CFD00439921 /* lineShader.fs in Sources */,
 				4E6E0DC3273EDD1700A66F14 /* glad.c in Sources */,
 				4E6E0DC1273EDD1700A66F14 /* Cube.cpp in Sources */,

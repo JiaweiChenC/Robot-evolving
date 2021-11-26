@@ -87,9 +87,11 @@ public:
     void someStuffToMakesuretheDrawingWroking();
     bool theSame(Mass m1, Mass m2);
     void breathing();
-    void evolve();
+    void updateSprings();
+    void runningSimulate(double runningTime);
     glm::dvec3 getPosition();
     double getDistance();
+    void setDistance();
     Gene gene;
     
 private:
