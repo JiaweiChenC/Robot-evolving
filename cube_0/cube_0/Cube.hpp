@@ -65,19 +65,28 @@ public:
 };
 
 class Robot {
-    vector<Cube> robotCube;
+public:
+    vector<Mass> masses;
+    vector<Spring> springs;
+    vector<int> imMasses;
+    // constructor
+    Robot(double x, double y, double z);
+    void updateRobot();
+    void updateVertices();
+    void createCube (double x, double y, double z);
+    void someStuffToMakesuretheDrawingWroking();
+    bool theSame(Mass m1, Mass m2);
+    void breathing();
+    void evolve();
 };
 
-vector<Mass> generateMass(double mass, double length, double X, double Y, double Z);
-vector<Spring> generateSpring(double springConstant);
-void cubeUpdate(vector<Mass>& cubeMass, vector<Spring>& cubeSpring, int mode);
-double getDistance(double distance_vector[3]);
-void createCube();
-void createRobot(double x, double y, double z);
-void updateRobot();
-void updateVertices();
-void someStuffToMakesuretheDrawingWroking();
-bool theSame(Mass m1, Mass m2);
-void breathing();
-void evolve();
+
+//void createCube();
+//void createRobot(double x, double y, double z);
+//void updateRobot();
+//void updateVertices();
+//void someStuffToMakesuretheDrawingWroking();
+//bool theSame(Mass m1, Mass m2);
+//void breathing();
+//void evolve();
 #endif /* Cube_hpp */
