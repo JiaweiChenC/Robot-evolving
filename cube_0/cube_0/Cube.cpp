@@ -4,14 +4,14 @@ double LENGTH = 0.1;
 double gravity = 9.81;
 double T = 0;
 double L0 = 0.1;
-double dt = 0.0001;
+double dt = 0.001;
 double mu = 0.8;
 int DIM = 3;
-double omega = 10;
+double omega = 1;
 double restoreConstant = 10000;
-double kGround = 10000;
+double kGround = 5000;
 int springConstant = 5000;
-double DAMPING = 0.9;
+double DAMPING = 1;
 glm::dvec3 GRAVITY = {0, 0, -9.8};
 using namespace std;
 

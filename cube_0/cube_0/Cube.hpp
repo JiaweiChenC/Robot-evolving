@@ -41,6 +41,7 @@ struct Mass
     glm::dvec3 p;       // positon x, y, z
     glm::dvec3 v;        // velocity x, y, z
     glm::dvec3 a;        // acceleration
+    glm::dvec3 force;
 };
 
 struct Spring
@@ -49,16 +50,11 @@ struct Spring
     double L0;      // original length
     int m1;         // connected mass 1
     int m2;         // connected mass 2
-    double a = 0.1;
-    double b = 0.1;
-    double c = 0.1;
+    double a;
+    double b = 0.02;
+    double c = 0.01;
 };
 
-struct Force {
-    double x;
-    double y;
-    double z;
-};
 class Cube {
 public:
     int index;
@@ -82,6 +78,6 @@ void updateRobot();
 void updateVertices();
 void someStuffToMakesuretheDrawingWroking();
 bool theSame(Mass m1, Mass m2);
-double distance(Mass m1, Mass m2);
-void animate();
+void breathing();
+void evolve();
 #endif /* Cube_hpp */

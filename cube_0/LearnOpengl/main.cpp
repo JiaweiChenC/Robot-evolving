@@ -150,15 +150,18 @@ vector<Spring> spring0 = generateSpring(5000);
 
 int main()
 {
-    createRobot(0, 0, 0.1);
+    createRobot(0, 0, 0.001);
     someStuffToMakesuretheDrawingWroking();
     for (const auto& edge: myEdge_indices) {
         cout << "edge: " << edge << endl;
     }
     //updateVertices();
-//    for (const auto& spring: springs) {
-//        cout << spring.m1 <<' '<< spring.m2 << endl;
-//    }
+    for (Spring& spring: springs) {
+        spring.a = spring.L0;
+        cout << spring.m1 <<' '<< spring.m2 << endl;
+        cout << "original Length: " << spring.L0 << endl;
+        cout << "the length: " << glm::distance(masses[spring.m1].p, masses[spring.m2].p) << endl;;
+    }
 //    for (const auto& i: imMasses){
 //        cout << "masses index: " << i << endl;
 //    }
@@ -316,7 +319,11 @@ int main()
         // draw line
             updateRobot();
             updateVertices();
+            breathing();
             cout << "global Time Now: " << T <<  endl;
+            cout << "position: " << masses[0].p.z << endl;
+            cout << "velocity: " << masses[0].v.z << endl;
+            cout << "acceleration: " << masses[0].a.z << endl;
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             // std::cout << "Global Time now: " << T << endl;
@@ -634,64 +641,44 @@ void createRobot(double x, double y, double z){
 }
 
 void updateRobot() {
-//    for (int i = 0; i < springs.size(); i++) {
-//        if (i % 8 == 0) {
-//            springs[i].a = a;
-//            springs[i].b = b;
-//            springs[i].c = c;
-//            springs[i].L0 = springs[i].a + springs[i].b*sin(T*omega + springs[i].c);
-//        }
-//    }
-//
     for (int i = 0; i < masses.size(); i++) {
-        glm::dvec3 currentForce(0.0);
-        double F_c = 0;
-        double F_h = 0;
-        double F_v = 0;
-        for (const Spring spring: springs) {
-//            cout << "springLength: " << spring.L0 << endl;
-            if(spring.m1 == i || spring.m2 == i) {
-//                cout << springs[i].m1 << " " << springs[i].m2 << endl;
-                glm::dvec3 springForce(0.0);
-                glm::dvec3 direction(0.0);
-                direction = glm::normalize(masses[spring.m2].p - masses[spring.m1].p);
-                double currentLength = distance(masses[spring.m1].p, masses[spring.m2].p);
-//                cout <<"current Length: " << currentLength <<  endl;
-                double F = spring.k * (currentLength - spring.L0);
-//                cout << "current f" << F << endl;
-//                cout << "direction " << direction.x << endl;
-                if(spring.m1 == i) {
-                    springForce = F * direction;
-                }
-                else {
-                    springForce = -F * direction;
-                }
-                currentForce += + springForce;
+        
+        masses[i].force = {0, 0, 0};
+        glm::dvec3 springForce(0.0);
+        glm::dvec3 springDirection(0.0);
+        double springLength;
+        for (const Spring& spring: springs) {
+            // find the corresponding spring
+            springLength = glm::distance(masses[spring.m1].p, masses[spring.m2].p);
+            if (spring.m1 == i) {
+                springDirection = glm::normalize(masses[spring.m2].p - masses[spring.m1].p);
+                springForce = springDirection * spring.k * (springLength - spring.L0);
+                masses[i].force += springForce;
+            }
+            else if(spring.m2 == i) {
+                springDirection = glm::normalize(masses[spring.m1].p - masses[spring.m2].p);
+                springForce = springDirection * spring.k * (springLength - spring.L0);
+                masses[i].force += springForce;
             }
         }
-        currentForce.z = currentForce.z + GRAVITY.z * MASS;
-        if (masses[i].p[2] < 0) {
-            F_c = -kGround * masses[i].p[2];
-            cout << "fc" << F_c << endl;
-            currentForce.z = currentForce.z + F_c;
-            F_h = sqrt(pow(currentForce.x, 2) +  pow(currentForce.y, 2));
-            F_v = currentForce.z;
-            if (F_h < mu * F_v) {
-                masses[i].p[0] = 0;
-                masses[i].p[1] = 0;
-            }
-            else {
-                currentForce.x = currentForce.x - F_v * mu;
-                currentForce.y = currentForce.y - F_v * mu;
-            }
+        masses[i].force += GRAVITY * MASS;
+        if(masses[i].p.z < 0) {
+            double F_c = -kGround * masses[i].p.z;
+            masses[i].force.z += F_c;
+            glm::dvec3 frictionForce(0.0);
+            glm::dvec3 frictionDirection(0.0);
+            frictionDirection = glm::normalize(glm::dvec3(-masses[i].v.x, -masses[i].v.y, 0));
+            frictionForce = frictionDirection * F_c * mu;
+            masses[i].force += frictionForce;
         }
-
-        masses[i].v *= DAMPING;
-        masses[i].a = currentForce/MASS;
-        masses[i].v += masses[i].a * dt;
-        masses[i].p += masses[i].v * dt;
     }
-    T += dt;
+    for (int i = 0; i < masses.size(); i++) {
+    masses[i].a = masses[i].force/MASS;
+    masses[i].v += masses[i].a*dt;
+    masses[i].p += masses[i].v*dt;
+    masses[i].v *= DAMPING;
+    }
+    T+= dt;
 }
 
 
@@ -794,6 +781,15 @@ void someStuffToMakesuretheDrawingWroking() {
         for (int g = 0; g < 12; g++) {
             myEdge_indices[24 * i + 2 * g] = tempCube[edgeIndices[g][0]];
             myEdge_indices[24 * i + 2 * g + 1] = tempCube[edgeIndices[g][1]];
+        }
+    }
+}
+
+void breathing() {
+    for (int i = 0; i < springs.size(); i++) {
+        if (i  < 28) {
+            springs[i].L0 = springs[i].a + springs[i].b * sin(10 * T + c);
+            cout <<"springLength: " << springs[i].L0 << endl;
         }
     }
 }
