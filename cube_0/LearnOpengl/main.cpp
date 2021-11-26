@@ -29,6 +29,7 @@ bool firstMouse = true;
 const int cube_num = 27;
 const int robot_num = 1;
 const int mass_num = 64;
+bool animation = false;
 // timing
 float deltaTime = 0.0f;    // time between current frame and last frame
 float lastFrame = 0.0f;
@@ -357,7 +358,7 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 0.0f);
         
-        if (true){
+        if (animation){
             robot0.updateRobot();
             robot0.updateVertices();
             robot0.getPosition();

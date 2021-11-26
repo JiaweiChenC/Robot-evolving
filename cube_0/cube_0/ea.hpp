@@ -12,8 +12,10 @@
 #include <stdio.h>
 
 vector<Robot> generateRobotGroup(int robotNum);
-Robot mutateRobot(Robot robot);
-vector<Robot> crossoverRobot();
-double getDiversity(vector<Robot> robotGroup);
+void mutateRobot(Robot& robot);
+void selection(vector<Robot>& robotGroup);
+void crossoverRobot(vector<Robot>& robotGroup);
+double getDiversity(vector<Robot>& robotGroup);
 double getGroupDistance(vector<Robot> robot);
+vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotReturn, double cycleTime);
 #endif /* ea_hpp */
