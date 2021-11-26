@@ -24,8 +24,9 @@ extern GLdouble myShade_color[];
 extern GLuint myShadeindices[];
 extern vector<vector<GLuint>> faceIndices;
 extern vector<vector<GLuint>> edgeIndices;
-using namespace std;
 
+
+using namespace std;
 Robot::Robot(double x, double y, double z){
     for (int i = 0; i < DIM; i++){
         for (int j = 0; j < DIM; j++){
@@ -34,6 +35,7 @@ Robot::Robot(double x, double y, double z){
             }
         }
     }
+    startPos = getPosition();
 }
 
 void Robot::createCube (double x, double y, double z) {
@@ -258,3 +260,18 @@ bool Robot::theSame(Mass m1, Mass m2){
     }
     return false;
 }
+
+glm::dvec3 Robot::getPosition() {
+    glm::dvec3 pos(0.0);
+    for (const Mass& mass: masses) {
+        pos += mass.p;
+    }
+    currentPos = pos/(double)masses.size();
+    return currentPos;
+}
+
+double Robot::getDistance() {
+    moveDistance = glm::distance(currentPos, startPos);
+    return  moveDistance;
+}
+

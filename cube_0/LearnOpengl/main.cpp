@@ -146,7 +146,7 @@ vector<vector<GLuint>> edgeIndices{
 
 int main()
 {
-    Robot robot0(0, 0, 0.01);
+    Robot robot0(0, 0, 0.1);
     robot0.someStuffToMakesuretheDrawingWroking();
 //    createRobot(0, 0, 0.001);
 //    someStuffToMakesuretheDrawingWroking();
@@ -321,6 +321,9 @@ int main()
 //            cout << "acceleration: " << masses[0].a.z << endl;
             robot0.updateRobot();
             robot0.updateVertices();
+            robot0.getPosition();
+            cout << "at" << robot0.getPosition().x << endl;
+            cout <<"travel distance" << robot0.getDistance() << endl;
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             // std::cout << "Global Time now: " << T << endl;
@@ -561,13 +564,5 @@ unsigned int loadCubemap(vector<std::string> faces)
 }
 
 
-
-
-// Robot is a set of cube
-
-
-
-
-// renew indices!
 
 

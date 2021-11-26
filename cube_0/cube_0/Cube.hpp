@@ -34,7 +34,9 @@ extern int DIM;
 extern double omega;
 extern double kGround;
 using namespace std;
-
+extern const int cube_num;
+extern const int robot_num;
+extern const int mass_num;
 struct Mass
 {
     double m = MASS;           // mass
@@ -64,11 +66,14 @@ public:
     Cube(double x, double y, double z);
 };
 
+struct Gene {
+    vector<double> k;
+    vector<double> b;
+    vector<double> c;
+};
+
 class Robot {
 public:
-    vector<Mass> masses;
-    vector<Spring> springs;
-    vector<int> imMasses;
     // constructor
     Robot(double x, double y, double z);
     void updateRobot();
@@ -78,6 +83,16 @@ public:
     bool theSame(Mass m1, Mass m2);
     void breathing();
     void evolve();
+    glm::dvec3 getPosition();
+    double getDistance();
+    Gene gene;
+private:
+    vector<Mass> masses;
+    vector<Spring> springs;
+    vector<int> imMasses;
+    glm::dvec3 startPos;
+    glm::dvec3 currentPos;
+    double moveDistance;
 };
 
 
