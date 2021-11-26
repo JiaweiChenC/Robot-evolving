@@ -11,11 +11,12 @@ double omega = 1;
 double restoreConstant = 10000;
 double kGround = 5000;
 int springConstant = 5000;
+int motorCube = 5;
 double DAMPING = 1;
+bool evolution = true;
 glm::dvec3 GRAVITY = {0, 0, -9.8};
-
 extern GLdouble cubeVertices[]; // cube_count * 8 points * 3 (x, y, z)
-extern GLdouble myCube_color[]; // cube_count * 8 points * 3 bit
+extern GLdouble cubeColor[]; // cube_count * 8 points * 3 bit
 extern GLuint cubeIndices[];   // cube_count * 6 faces * 2 triangles * 3 indices
 extern GLdouble myEdge_color[];      // cube_count * 8 points * 3 bit
 extern GLuint myEdge_indices[]; // cube_count * 12 * 2
@@ -25,13 +26,27 @@ extern GLuint myShadeindices[];
 extern vector<vector<GLuint>> faceIndices;
 extern vector<vector<GLuint>> edgeIndices;
 
-
+std::random_device dev;
+std::mt19937 rng(dev());
+std::uniform_real_distribution<> dist0(0, 1);
+std::uniform_int_distribution<> dist1(3000, 10000);
+std::uniform_real_distribution<> dist2(-0.4, 0.4);
 using namespace std;
 Robot::Robot(double x, double y, double z){
     for (int i = 0; i < DIM; i++){
         for (int j = 0; j < DIM; j++){
             for (int k = 0; k < DIM; k++){
-                createCube((double)(i)/10.0 + x, (double)(j)/10.0 + y, (double)(k)/10.0 + z);
+                createCube((double)(k)/10.0 + x, (double)(j)/10.0 + y, (double)(i)/10.0 + z);
+//                if (false) {
+//                    for (int count = 0; count < cube_num; count++) {
+//                        gene.k.push_back(dist1(rng));
+//                    }
+//                    // have motorCube to generate power for cube
+//                    for (int count = 0; count < motorCube; count++) {
+//                        gene.c.push_back(dist0(rng) * 2 * M_PI);
+//                        gene.b.push_back(dist2(rng));
+//                    }
+//                }
             }
         }
     }
@@ -99,6 +114,7 @@ void Robot::createCube (double x, double y, double z) {
     }
     for (Spring& spring: springs){
         spring.L0 = distance(masses[spring.m1].p, masses[spring.m2].p);
+        spring.a= distance(masses[spring.m1].p, masses[spring.m2].p);
     }
 }
 
@@ -188,7 +204,6 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
             cubeIndices[36 * i + 1 + 3 * k] = tempCube[faceIndices[k][1]];
             cubeIndices[36 * i + 2 + 3 * k] = tempCube[faceIndices[k][2]];
         }
-        
         for (int g = 0; g < 12; g++) {
             myEdge_indices[24 * i + 2 * g] = tempCube[edgeIndices[g][0]];
             myEdge_indices[24 * i + 2 * g + 1] = tempCube[edgeIndices[g][1]];
@@ -206,9 +221,11 @@ void Robot::updateVertices() {
 
 void Robot::breathing() {
     for (int i = 0; i < springs.size(); i++) {
-        if (i  < 28) {
+        // choose 0, 2, 6, 8, 13 as motor cube
+        if (i  < 180) {
             springs[i].L0 = springs[i].a + springs[i].b * sin(10 * T + springs[i].c);
             cout <<"springLength: " << springs[i].L0 << endl;
+            cout << "a: " << springs[i].a << endl;
         }
     }
 }

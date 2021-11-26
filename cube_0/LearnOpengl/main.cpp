@@ -37,8 +37,8 @@ double a = LENGTH;
 double b = 0.1;
 double c = 0.1;
 
-GLdouble cubeVertices[mass_num * 3 * robot_num]; // cube_count * 8 points * 3 (x, y, z)
-GLdouble myCube_color[cube_num * 24 * robot_num]; // cube_count * 8 points * 3 bit
+GLdouble cubeVertices[mass_num * 3 * robot_num]; // cube_count * 64 points * 3 (x, y, z)
+//GLdouble cubeColor[mass_num * 3 * robot_num]; // cube_count * 64 points * 3 bit
 GLuint cubeIndices[cube_num * 36 * robot_num];   // cube_count * 6 faces * 2 triangles * 3 indices
 GLdouble myEdge_color[cube_num * 24 * robot_num];      // cube_count * 8 points * 3 bit
 GLuint myEdge_indices[cube_num * 24 * robot_num]; // cube_count * 12 * 2
@@ -46,6 +46,82 @@ GLdouble myShade_vertex[cube_num * 24 * robot_num];
 GLdouble myShade_color[cube_num * 24 * robot_num];
 GLuint myShadeindices[cube_num * 36 * robot_num];
 
+GLdouble cubeColor[] = {
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    0.2, 0.2, 0.9,
+    
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    0.9, 0.2, 0.2,
+    
+};
+
+vector<Robot> robotGroup;
 
 float skyboxVertices[] = {
     // positions
@@ -146,34 +222,8 @@ vector<vector<GLuint>> edgeIndices{
 
 int main()
 {
-    Robot robot0(0, 0, 0.1);
+    Robot robot0(0, 0, 0.01);
     robot0.someStuffToMakesuretheDrawingWroking();
-//    createRobot(0, 0, 0.001);
-//    someStuffToMakesuretheDrawingWroking();
-//    //updateVertices();
-//    for (Spring& spring: springs) {
-//        spring.a = spring.L0;
-//        cout << spring.m1 <<' '<< spring.m2 << endl;
-//        cout << "original Length: " << spring.L0 << endl;
-//        cout << "the length: " << glm::distance(masses[spring.m1].p, masses[spring.m2].p) << endl;
-//    }
-//    for (const auto& i: imMasses){
-//        cout << "masses index: " << i << endl;
-//    }
-//    for (const auto& mass: masses){
-//        cout << "massPosition\n" << "x: " << mass.p[0] << "y: " << mass.p[1] <<"z: " <<  mass.p[2] << endl;
-//   }
-//    for (const auto& i: cubeIndices) {
-//        cout << "triangle indices: " << i << endl;
-//    }
-//    for (const auto& i: cubeVertices) {
-//        cout << "vertices: " << i << endl;
-//    }
-//    cout << "vertices " << sizeof(cubeVertices) << endl;
-//    cout << "num indices: " << sizeof(cubeIndices) << endl;
-//    cout << "number masses: " << masses.size() << endl;
-//    cout << "number springs: " << springs.size() << endl;
-//    cout <<"mass index: " << imMasses.size() << endl;
     
     // glfw: initialize and configure
     // ------------------------------
@@ -208,6 +258,7 @@ int main()
         return -1;
     }
     glEnable(GL_DEPTH_TEST);
+    
     // build and compile our shader zprogram
     // ------------------------------------
     Shader planeShader("cube_0/planeShader.vs", "cube_0/planeShader.fs");
@@ -262,6 +313,15 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_DYNAMIC_DRAW);
     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
     glEnableVertexAttribArray(0);
+    GLuint colorbufferCube;
+    glGenBuffers(1, &colorbufferCube);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbufferCube);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeColor), cubeColor, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
+    glEnableVertexAttribArray(1);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeColor), &cubeColor, GL_DYNAMIC_DRAW);
+//    glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
+//    glEnableVertexAttribArray(1);
     
     Shader edgeShader("cube_0/lineShader.vs", "cube_0/lineShader.fs");
     unsigned int edgeVAO, edgeVBO, edgeEBO;
@@ -275,21 +335,8 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(myEdge_indices), myEdge_indices, GL_DYNAMIC_DRAW);
     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
     glEnableVertexAttribArray(0);
-    
-//    Shader cubeShader("cube_0/standardShader.vs", "cube_0/standardShader.fs");
-//    unsigned int pointVAO, pointVBO;
-//    glGenVertexArrays(1, &pointVAO);
-//    glGenBuffers(1, &pointVBO);
-//    glBindVertexArray(pointVAO);
-//    glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
-//    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
-//    glEnableVertexAttribArray(0);
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
-//    glBindVertexArray(0);
-//    glEnableVertexAttribArray(1);
-//    glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0);
-    
+
+    // cubeColor buffer
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -311,17 +358,10 @@ int main()
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 0.0f);
         
         if (true){
-        // draw line
-//            updateRobot();
-//            updateVertices();
-//            breathing();
-//            cout << "global Time Now: " << T <<  endl;
-//            cout << "position: " << masses[0].p.z << endl;
-//            cout << "velocity: " << masses[0].v.z << endl;
-//            cout << "acceleration: " << masses[0].a.z << endl;
             robot0.updateRobot();
             robot0.updateVertices();
             robot0.getPosition();
+            robot0.breathing();
             cout << "at" << robot0.getPosition().x << endl;
             cout <<"travel distance" << robot0.getDistance() << endl;
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -344,14 +384,9 @@ int main()
             model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1, 0, 0));
             model = glm::translate(model, vec3(-0.5, -0.5, -0.5));
             
-//            glDepthFunc(GL_ALWAYS);
-//            cubeShader.use();
-//            cubeShader.setMat4("MVP", projection * view * model);
-//            glPointSize(15.0f);
-//            glBindVertexArray(pointVAO);
-//            glDrawArrays(GL_POINT, 0, 64);
-            // draw cube
+
             glDepthFunc(GL_ALWAYS);
+            
             cubeShader.use();
             cubeShader.setMat4("MVP", projection * view * model);
             glBindVertexArray(cubeVAO);
@@ -372,50 +407,7 @@ int main()
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
             
-//            for (int i=0; i < 28; i++){
-//                Line line(vec3(mass0[cubeIndices[i][0]].p), mass0[cubeIndices[i][1]].p);
-//                line.setMVP(projection * view * model);
-//                line.setColor(vec3(0, 0, 1));
-//                line.draw();
-//            }
             
-//            for (int i=0; i < 8; i++){
-//                Point point(vec3(mass0[i].p));
-//                point.setMVP(projection * view * model);
-//                point.setColor(vec3(0, 1, 0));
-//                if (mass0[i].p[2] < 0.01){
-//                    point.setColor(vec3(0.1, 0.9, 0.2));
-//                }
-//                point.draw();
-//            }
-//
-//            for (int i = 0; i < 12; i++) {
-//                DrawFace face(mass0[faceIndices[i][0]].p, mass0[faceIndices[i][1]].p, mass0[faceIndices[i][2]].p);
-//                face.setMVP(projection * view * model);
-//                face.setColor(vec3(0.9, 0.4, 0.9));
-//                face.draw();
-//            }
-            //updateRobot();
-//            cout << masses.size() << endl;
-//            for (int i = 0; i < masses.size(); i++) {
-//                cout << "whathappend: " << i << endl;
-//                point_vertices.push_back(masses[i].p[0]);
-//                point_vertices.push_back(masses[i].p[1]);
-//                point_vertices.push_back(masses[i].p[2]);
-//            }
-//            cout << sizeof(point_vertices) << endl;
-//            cout << sizeof(double) << endl;
-//            Point point;
-//            point.setMVP(projection * view * model);
-//            point.setColor(vec3(0.4, 0.4, 0.9));
-//            point.draw();
-            
-//            for (int i = 0; i < springs.size(); i++) {
-//                Line line(vec3(masses[springs[i].m1].p), vec3(masses[springs[i].m2].p));
-//                line.setMVP(projection * view * model);
-//                line.setColor(vec3(0, 0, 1));
-//                line.draw();
-//            }
             glDepthFunc(GL_EQUAL);
             skyboxShader.use();
             view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
@@ -524,15 +516,6 @@ unsigned int loadTexture(char const * path)
     return textureID;
 }
 
-// loads a cubemap texture from 6 individual texture faces
-// order:
-// +X (right)
-// -X (left)
-// +Y (top)
-// -Y (bottom)
-// +Z (front)
-// -Z (back)
-// -------------------------------------------------------
 unsigned int loadCubemap(vector<std::string> faces)
 {
     unsigned int textureID;
@@ -562,7 +545,4 @@ unsigned int loadCubemap(vector<std::string> faces)
 
     return textureID;
 }
-
-
-
 
