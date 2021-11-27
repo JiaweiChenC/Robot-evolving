@@ -13,7 +13,7 @@ double kGround = 5000;
 int springConstant = 5000;
 int motorCube = 5;
 double DAMPING = 1;
-const double mutatePro = 0.1;
+const double mutatePro = 0.02;
 const double crossPro = 0.4;
 const double selectPressure = 0.3;
 extern bool animation;
