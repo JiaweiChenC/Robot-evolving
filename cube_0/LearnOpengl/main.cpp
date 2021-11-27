@@ -13,8 +13,9 @@ using namespace std;
 using namespace glm;
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-void drawGrid();
-void drawCoord();
+
+
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -39,7 +40,7 @@ double b = 0.1;
 double c = 0.1;
 
 
-bool animation = false;
+bool animation = true;
 
 
 GLdouble cubeVertices[mass_num * 3 * robot_num]; // cube_count * 64 points * 3 (x, y, z)
@@ -227,13 +228,13 @@ vector<vector<GLuint>> edgeIndices{
 
 int main()
 {
-    Robot robot0(0, 0, 0.01);
-    robot0.someStuffToMakesuretheDrawingWroking();
-    robot0.runningSimulate(2);
-    
+     //vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotReturn, double cycleTime);
+     vector<Robot> result = geneticAlgorithm(50, 50, 1, 2, true);
+     cout << "the final travel distance is: " << result[0].getDistance() << endl;
     // glfw: initialize and configure
-    // ------------------------------
-    
+    Robot robot0(0, 0, 0.2);
+    robot0.someStuffToMakesuretheDrawingWroking();
+//    robot0.runningSimulate(2);
     if (animation){
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -364,15 +365,16 @@ int main()
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 0.0f);
-        
         if (true){
-//            robot0.updateRobot();
-//            robot0.updateVertices();
-//            robot0.getPosition();
-//            robot0.breathing();
-            robot0.runningSimulate(2);
-            cout << "at" << robot0.getPosition().x << endl;
-            cout <<"travel distance" << robot0.getDistance() << endl;
+            robot0.updateRobot();
+            robot0.updateVertices();
+            robot0.breathing();
+//            robot0.runningSimulate(2);
+            robot0.setDistance();
+            T += dt;
+//            cout << "global time: " << T << endl;
+//            cout <<"at height: " << robot0.getPosition().z << endl;
+//            cout <<"travel distance" << robot0.getDistance() << endl;
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             // std::cout << "Global Time now: " << T << endl;

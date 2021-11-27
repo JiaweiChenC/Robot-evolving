@@ -15,7 +15,7 @@
 #include <vector>
 #include <random>
 #include <GLFW/glfw3.h>
-
+#include <fstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 extern const double MASS;
@@ -88,10 +88,10 @@ public:
     bool theSame(Mass m1, Mass m2);
     void breathing();
     void updateSprings();
-    void runningSimulate(double runningTime);
     glm::dvec3 getPosition();
     double getDistance();
     void setDistance();
+    double moveDistance;
     Gene gene;
     
 private:
@@ -100,23 +100,15 @@ private:
     vector<int> imMasses;
     glm::dvec3 startPos;
     glm::dvec3 currentPos;
-    double moveDistance;
 };
 
 vector<Robot> generateRobotGroup(int robotNum);
-void mutateRobot(Robot& robot);
+vector<Robot> generateRobotGroup2(int robotNum);
+void mutateRobot(vector<Robot>& robotGroup);
 void selection(vector<Robot>& robotGroup);
-void crossoverRobot(vector<Robot>& robotGroup);
+vector<Robot> crossoverRobot(Robot parent1, Robot parent2);
 double getDiversity(vector<Robot>& robotGroup);
 double getGroupDistance(vector<Robot> robot);
-vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotReturn, double cycleTime);
-
-//void createCube();
-//void createRobot(double x, double y, double z);
-//void updateRobot();
-//void updateVertices();
-//void someStuffToMakesuretheDrawingWroking();
-//bool theSame(Mass m1, Mass m2);
-//void breathing();
-//void evolve();
+vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotReturn, double cycleTime, bool record);
+void runningSimulate(Robot& robot, double runningTime);
 #endif /* Cube_hpp */
