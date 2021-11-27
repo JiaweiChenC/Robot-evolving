@@ -229,11 +229,27 @@ vector<vector<GLuint>> edgeIndices{
 int main()
 {
      //vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotReturn, double cycleTime);
-     vector<Robot> result = geneticAlgorithm(50, 50, 1, 2, true);
-     cout << "the final travel distance is: " << result[0].getDistance() << endl;
+//     vector<Robot> result = geneticAlgorithm(50, 50, 1, 2, true);
+//     cout << "the final travel distance is: " << result[0].getDistance() << endl;
     // glfw: initialize and configure
     Robot robot0(0, 0, 0.2);
+//    Robot robot1(1, 0, 0.1);
+//    Robot robot2(-1, 0, 0.15);
+//    Robot robot3(2, 0, 0.2);
+//    Robot robot4(-2, 0, 0.1);
+//    Robot robot5(3, 0, 0.15);
+//    Robot robot6(-3, 0, 0.2);
+//    Robot robot7(4, 0, 0.1);
+//    Robot robot8(-4, 0, 0.15);
     robot0.someStuffToMakesuretheDrawingWroking();
+//    robot1.someStuffToMakesuretheDrawingWroking();
+//    robot2.someStuffToMakesuretheDrawingWroking();
+//    robot3.someStuffToMakesuretheDrawingWroking();
+//    robot4.someStuffToMakesuretheDrawingWroking();
+//    robot5.someStuffToMakesuretheDrawingWroking();
+//    robot6.someStuffToMakesuretheDrawingWroking();
+//    robot7.someStuffToMakesuretheDrawingWroking();
+//    robot8.someStuffToMakesuretheDrawingWroking();
 //    robot0.runningSimulate(2);
     if (animation){
     glfwInit();
@@ -370,7 +386,7 @@ int main()
             robot0.updateVertices();
             robot0.breathing();
 //            robot0.runningSimulate(2);
-            robot0.setDistance();
+//            robot0.setDistance();
             T += dt;
 //            cout << "global time: " << T << endl;
 //            cout <<"at height: " << robot0.getPosition().z << endl;
@@ -407,8 +423,135 @@ int main()
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
             
-            glDepthFunc(GL_ALWAYS);
-            glEnable(GL_LINE_SMOOTH);
+//            robot1.updateRobot();
+//            robot1.updateVertices();
+//            robot1.breathing();
+//            glDepthFunc(GL_ALWAYS);
+//
+//            cubeShader.use();
+//            cubeShader.setMat4("MVP", projection * view * model);
+//            glBindVertexArray(cubeVAO);
+//            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+//            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+//            glDrawElements(GL_TRIANGLES, 12 * 3 * cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+//            glBindBuffer(GL_ARRAY_BUFFER, 0);
+//            glBindVertexArray(0);
+//            glDepthFunc(GL_ALWAYS);
+//            glEnable(GL_LINE_SMOOTH);
+//
+//            robot2.updateRobot();
+//            robot2.updateVertices();
+//            robot2.breathing();
+//            glDepthFunc(GL_ALWAYS);
+//
+//            cubeShader.use();
+//            cubeShader.setMat4("MVP", projection * view * model);
+//            glBindVertexArray(cubeVAO);
+//            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+//            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+//            glDrawElements(GL_TRIANGLES, 12 * 3 * cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+//            glBindBuffer(GL_ARRAY_BUFFER, 0);
+//            glBindVertexArray(0);
+//            glDepthFunc(GL_ALWAYS);
+//            glEnable(GL_LINE_SMOOTH);
+//
+//            robot3.updateRobot();
+//            robot3.updateVertices();
+//            robot3.breathing();
+//            glDepthFunc(GL_ALWAYS);
+//
+//            cubeShader.use();
+//            cubeShader.setMat4("MVP", projection * view * model);
+//            glBindVertexArray(cubeVAO);
+//            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+//            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+//            glDrawElements(GL_TRIANGLES, 12 * 3 * cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+//            glBindBuffer(GL_ARRAY_BUFFER, 0);
+//            glBindVertexArray(0);
+//            glDepthFunc(GL_ALWAYS);
+//            glEnable(GL_LINE_SMOOTH);
+//
+//            robot4.updateRobot();
+//            robot4.updateVertices();
+//            robot4.breathing();
+//            glDepthFunc(GL_ALWAYS);
+//
+//            cubeShader.use();
+//            cubeShader.setMat4("MVP", projection * view * model);
+//            glBindVertexArray(cubeVAO);
+//            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+//            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+//            glDrawElements(GL_TRIANGLES, 12 * 3 * cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+//            glBindBuffer(GL_ARRAY_BUFFER, 0);
+//            glBindVertexArray(0);
+//            glDepthFunc(GL_ALWAYS);
+//            glEnable(GL_LINE_SMOOTH);
+//
+//            robot5.updateRobot();
+//            robot5.updateVertices();
+//            robot5.breathing();
+//            glDepthFunc(GL_ALWAYS);
+//
+//            cubeShader.use();
+//            cubeShader.setMat4("MVP", projection * view * model);
+//            glBindVertexArray(cubeVAO);
+//            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+//            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+//            glDrawElements(GL_TRIANGLES, 12 * 3 * cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+//            glBindBuffer(GL_ARRAY_BUFFER, 0);
+//            glBindVertexArray(0);
+//            glDepthFunc(GL_ALWAYS);
+//            glEnable(GL_LINE_SMOOTH);
+//
+//            robot6.updateRobot();
+//            robot6.updateVertices();
+//            robot6.breathing();
+//            glDepthFunc(GL_ALWAYS);
+//
+//            cubeShader.use();
+//            cubeShader.setMat4("MVP", projection * view * model);
+//            glBindVertexArray(cubeVAO);
+//            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+//            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+//            glDrawElements(GL_TRIANGLES, 12 * 3 * cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+//            glBindBuffer(GL_ARRAY_BUFFER, 0);
+//            glBindVertexArray(0);
+//            glDepthFunc(GL_ALWAYS);
+//            glEnable(GL_LINE_SMOOTH);
+//
+//            robot7.updateRobot();
+//            robot7.updateVertices();
+//            robot7.breathing();
+//            glDepthFunc(GL_ALWAYS);
+//
+//            cubeShader.use();
+//            cubeShader.setMat4("MVP", projection * view * model);
+//            glBindVertexArray(cubeVAO);
+//            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+//            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+//            glDrawElements(GL_TRIANGLES, 12 * 3 * cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+//            glBindBuffer(GL_ARRAY_BUFFER, 0);
+//            glBindVertexArray(0);
+//            glDepthFunc(GL_ALWAYS);
+//            glEnable(GL_LINE_SMOOTH);
+//
+//            robot8.updateRobot();
+//            robot8.updateVertices();
+//            robot8.breathing();
+//            glDepthFunc(GL_ALWAYS);
+//
+//            cubeShader.use();
+//            cubeShader.setMat4("MVP", projection * view * model);
+//            glBindVertexArray(cubeVAO);
+//            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+//            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_DYNAMIC_DRAW);
+//            glDrawElements(GL_TRIANGLES, 12 * 3 * cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+//            glBindBuffer(GL_ARRAY_BUFFER, 0);
+//            glBindVertexArray(0);
+//            glDepthFunc(GL_ALWAYS);
+//            glEnable(GL_LINE_SMOOTH);
+            
+            
             edgeShader.use();
             edgeShader.setMat4("MVP", projection * view * model);
             glBindVertexArray(edgeVAO);

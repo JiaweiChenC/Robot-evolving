@@ -220,6 +220,7 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
     }
 }
 
+
 void Robot::updateVertices() {
     for (int i = 0; i < masses.size(); i++) {
         for (int j = 0; j < 3; j++) {
