@@ -19,14 +19,12 @@ const double selectPressure = 0.3;
 extern bool animation;
 bool evolution = true;
 glm::dvec3 GRAVITY = {0, 0, -9.8};
-extern GLdouble cubeVertices[]; // cube_count * 8 points * 3 (x, y, z)
-extern GLdouble cubeColor[]; // cube_count * 8 points * 3 bit
-extern GLuint cubeIndices[];   // cube_count * 6 faces * 2 triangles * 3 indices
-extern GLdouble myEdge_color[];      // cube_count * 8 points * 3 bit
-extern GLuint myEdge_indices[]; // cube_count * 12 * 2
-extern GLdouble myShade_vertex[];
-extern GLdouble myShade_color[];
-extern GLuint myShadeindices[];
+vector<GLdouble> cubeVertices; // cube_count * 8 points * 3 (x, y, z)
+vector<GLdouble> cubeColor; // cube_count * 8 points * 3 bit
+vector<GLuint> cubeIndices;   // cube_count * 6 faces * 2 triangles * 3 indices
+vector<GLdouble> myEdge_color;      // cube_count * 8 points * 3 bit
+vector<GLuint> myEdge_indices; // cube_count * 12 * 2
+vector<GLuint> myShadeindices;
 extern vector<vector<GLuint>> faceIndices;
 extern vector<vector<GLuint>> edgeIndices;
 
@@ -34,16 +32,19 @@ std::random_device dev;
 std::mt19937 rng(dev());
 std::uniform_real_distribution<> dist0(0, 1);
 std::uniform_int_distribution<> dist1(3000, 15000);
-std::uniform_real_distribution<> dist2(-0.05, 0.05);
+std::uniform_real_distribution<> dist2(-0.02, 0.02);
 using namespace std;
 Robot::Robot(double x, double y, double z){
-    for (int i = 0; i < DIM; i++){
+    for (int i = 0; i < DIM   ; i++){
         for (int j = 0; j < DIM; j++){
-            for (int k = 0; k < DIM; k++){
+            for (int k = 0; k < DIM ; k++){
                 createCube((double)(k)/10.0 + x, (double)(j)/10.0 + y, (double)(i)/10.0 + z);
                 }
             }
         }
+
+
+
     if (evolution) {
     // get the correspond parameters
     // every cube will have a k
@@ -63,6 +64,10 @@ Robot::Robot(double x, double y, double z){
 }
 
 void Robot::createCube (double x, double y, double z) {
+    cube_num += 1;
+    vector<double> position = {x ,y ,z};
+    existCube.push_back(position);
+    cout << cube_num << endl;
     int n = (int)masses.size();
     // int n2 = (int)springs.size();
     // first create 8 masses
@@ -128,7 +133,7 @@ void Robot::createCube (double x, double y, double z) {
 }
 
 void Robot::someStuffToMakesuretheDrawingWroking() {
-    for (int i = 0; i < DIM*DIM*DIM; i++) {
+    for (int i = 0; i < cube_num; i++) {
         vector<int> tempCube(8);
         vector<int> upper(0);
         vector<int> down(0);
@@ -209,13 +214,15 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
         };
         
         for (int k = 0; k < 12; k++) {
-            cubeIndices[36 * i + 3 * k] = tempCube[faceIndices[k][0]];
-            cubeIndices[36 * i + 1 + 3 * k] = tempCube[faceIndices[k][1]];
-            cubeIndices[36 * i + 2 + 3 * k] = tempCube[faceIndices[k][2]];
+            cubeIndices.push_back(tempCube[faceIndices[k][0]]);
+            cubeIndices.push_back(tempCube[faceIndices[k][1]]);
+            cubeIndices.push_back(tempCube[faceIndices[k][2]]);
+//            cubeIndices[36 * i + 1 + 3 * k] = tempCube[faceIndices[k][1]];
+//            cubeIndices[36 * i + 2 + 3 * k] = tempCube[faceIndices[k][2]];
         }
         for (int g = 0; g < 12; g++) {
-            myEdge_indices[24 * i + 2 * g] = tempCube[edgeIndices[g][0]];
-            myEdge_indices[24 * i + 2 * g + 1] = tempCube[edgeIndices[g][1]];
+            myEdge_indices.push_back(tempCube[edgeIndices[g][0]]);
+            myEdge_indices.push_back(tempCube[edgeIndices[g][1]]);
         }
     }
 }
@@ -224,7 +231,20 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
 void Robot::updateVertices() {
     for (int i = 0; i < masses.size(); i++) {
         for (int j = 0; j < 3; j++) {
-            cubeVertices[3 * i + j] = masses[i].p[j];
+            cubeVertices.push_back(masses[i].p[j]);
+//            cubeVertices[3 * i + j] = masses[i].p[j];
+        }
+    }
+    for (int i = 0; i < masses.size(); i++) {
+        if(masses[i].p[2] <= 0.12) {
+            cubeColor.push_back(0.2);
+            cubeColor.push_back(0.2);
+            cubeColor.push_back(0.9);
+        }
+        else{
+            cubeColor.push_back(0.8);
+            cubeColor.push_back(0.3);
+            cubeColor.push_back(0.4);
         }
     }
 }
@@ -240,7 +260,7 @@ void Robot::breathing() {
 //                springs[20 * i + j].c = gene.c[i];
 //            }
 //    }
-    for (int i = 0; i < 180; i++) {
+    for (int i = 0; i < 28; i++) {
     springs[i].L0 = springs[i].a + springs[i].b * sin(omega * T + springs[i].c);
     }
 }

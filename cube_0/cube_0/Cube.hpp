@@ -34,9 +34,8 @@ extern int DIM;
 extern double omega;
 extern double kGround;
 using namespace std;
-extern const int cube_num;
-extern const int robot_num;
-extern const int mass_num;
+extern int robot_num;
+extern int mass_num;
 extern const double crossPro;
 extern const double mutatePro;
 extern const double selectPressure;
@@ -53,7 +52,7 @@ struct Mass
 
 struct Spring
 {
-    double k = 10000;       // spring constant
+    double k = 12000;       // spring constant
     double L0;      // original length
     int m1;         // connected mass 1
     int m2;         // connected mass 2
@@ -92,12 +91,14 @@ public:
     double getDistance();
     void setDistance();
     double moveDistance;
-    Gene gene;
-    
-private:
+    vector<vector<double>> existCube;// use to record where exists a cube, help mutate
     vector<Mass> masses;
     vector<Spring> springs;
     vector<int> imMasses;
+    int cube_num = 0;
+    Gene gene;
+    
+private:
     glm::dvec3 startPos;
     glm::dvec3 currentPos;
 };
