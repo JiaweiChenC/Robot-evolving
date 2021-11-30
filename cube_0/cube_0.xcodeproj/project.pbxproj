@@ -191,6 +191,8 @@
 		4EBDB917274EC57E00439921 /* planeShader.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = planeShader.fs; sourceTree = "<group>"; };
 		4EBDB918274F413200439921 /* draw.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = draw.h; sourceTree = "<group>"; };
 		4EBDB91927500CFD00439921 /* lineShader.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = lineShader.fs; sourceTree = "<group>"; };
+		4EF2D6862755E1F200E4ED3A /* pointShader.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = pointShader.vs; sourceTree = "<group>"; };
+		4EF2D6872755E20000E4ED3A /* pointShader.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = pointShader.fs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -235,6 +237,8 @@
 				4E6E0DB9273EDD1700A66F14 /* skybox.fs */,
 				4E6E0DB6273EDD1700A66F14 /* standardShader.fs */,
 				4E6E0DB8273EDD1700A66F14 /* standardShader.vs */,
+				4EF2D6862755E1F200E4ED3A /* pointShader.vs */,
+				4EF2D6872755E20000E4ED3A /* pointShader.fs */,
 				4E6E0DBB273EDD1700A66F14 /* lineShader.vs */,
 				4EBDB91927500CFD00439921 /* lineShader.fs */,
 				4EBDB917274EC57E00439921 /* planeShader.fs */,

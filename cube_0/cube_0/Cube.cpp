@@ -1,4 +1,5 @@
 #include "Cube.hpp"
+#include <time.h>
 const double MASS = 0.1;
 double LENGTH = 0.1;
 double gravity = 9.81;
@@ -21,10 +22,12 @@ bool evolution = true;
 glm::dvec3 GRAVITY = {0, 0, -9.8};
 vector<GLdouble> cubeVertices; // cube_count * 8 points * 3 (x, y, z)
 vector<GLdouble> cubeColor; // cube_count * 8 points * 3 bit
+vector<GLdouble> pointColor;
 vector<GLuint> cubeIndices;   // cube_count * 6 faces * 2 triangles * 3 indices
 vector<GLdouble> myEdge_color;      // cube_count * 8 points * 3 bit
 vector<GLuint> myEdge_indices; // cube_count * 12 * 2
 vector<GLuint> myShadeindices;
+
 extern vector<vector<GLuint>> faceIndices;
 extern vector<vector<GLuint>> edgeIndices;
 
@@ -35,14 +38,81 @@ std::uniform_int_distribution<> dist1(3000, 15000);
 std::uniform_real_distribution<> dist2(-0.02, 0.02);
 using namespace std;
 Robot::Robot(double x, double y, double z){
-    for (int i = 0; i < DIM   ; i++){
-        for (int j = 0; j < DIM; j++){
-            for (int k = 0; k < DIM ; k++){
-                createCube((double)(k)/10.0 + x, (double)(j)/10.0 + y, (double)(i)/10.0 + z);
-                }
+    int randomChoiceCube;
+    int randomChoiceFace;
+    createCube(x, y, z);
+    while(cube_num <= 10){
+        // choose a cube randomly
+        randomChoiceCube = rand() % cubes.size();
+        cout << "random choose: " << randomChoiceCube << endl;
+        Cube cube = cubes[randomChoiceCube];
+        // choose a face randomly
+        randomChoiceFace = rand() % 6;
+        // generate a cube in front
+        if (randomChoiceFace == 0) {
+            if (checkExist(cube.center[0] + 0.1, cube.center[1], cube.center[2])) {
+                randomChoiceCube = rand() % cubes.size();
+                randomChoiceFace = rand() % 6;
+                cube = cubes[randomChoiceCube];
+            }
+            else {
+            createCube(cube.center[0] + 0.1, cube.center[1], cube.center[2]);
             }
         }
-
+        // generate a cube in back
+        else if (randomChoiceFace == 1) {
+            if (checkExist(cube.center[0] - 0.1, cube.center[1], cube.center[2])) {
+                randomChoiceCube = rand() % cubes.size();
+                randomChoiceFace = rand() % 6;
+                cube = cubes[randomChoiceCube];
+            }
+            else {
+            createCube(cube.center[0] - 0.1, cube.center[1], cube.center[2]);
+            }
+        }
+        // generate a cube in left
+        else if (randomChoiceFace == 2) {
+            if (checkExist(cube.center[0], cube.center[1] + 0.1, cube.center[2])) {
+                randomChoiceCube = rand() % cubes.size();
+                randomChoiceFace = rand() % 6;
+                cube = cubes[randomChoiceCube];
+            }
+            else {
+            createCube(cube.center[0], cube.center[1] + 0.1, cube.center[2]);
+            }
+        }
+        // generate a cube in right
+        else if (randomChoiceFace == 3) {
+            if (checkExist(cube.center[0], cube.center[1] - 0.1, cube.center[2])) {
+                randomChoiceFace = rand() % 6;
+            }
+            else {
+            createCube(cube.center[0], cube.center[1] - 0.1, cube.center[2]);
+            }
+        }
+        // generate a cube top
+        else if (randomChoiceFace == 4) {
+            if (checkExist(cube.center[0], cube.center[1], cube.center[2] + 0.1)) {
+                randomChoiceCube = rand() % cubes.size();
+                randomChoiceFace = rand() % 6;
+                cube = cubes[randomChoiceCube];
+            }
+            else {
+            createCube(cube.center[0], cubes[randomChoiceCube].center[1], cubes[randomChoiceCube].center[2] + 0.1);
+            }
+        }
+        // generate a cube down
+        else if (randomChoiceFace == 5) {
+            if (checkExist(cube.center[0], cube.center[1], cube.center[2] - 0.1) || cube.center[2] - 0.1 < 0) {
+                randomChoiceCube = rand() % cubes.size();
+                randomChoiceFace = rand() % 6;
+                cube = cubes[randomChoiceCube];
+            }
+            else {
+            createCube(cube.center[0], cube.center[1], cube.center[2] - 0.1);
+            }
+        }
+    }
 
 
     if (evolution) {
@@ -63,11 +133,25 @@ Robot::Robot(double x, double y, double z){
     startPos = getPosition();
 }
 
+bool Robot::checkExist(double x, double y, double z) {
+    bool exist = false;
+    for (const auto& position: existCube){
+        if (position[0] == x && position[1] == y && position[2] == z) {
+            exist = true;
+        }
+    }
+    return exist;
+}
+
 void Robot::createCube (double x, double y, double z) {
+    Cube cube;
+    // this center is a center of xy face
+    cube.center = {x, y, z};
+    cout << "x: " << x << " y: " << y << " z: " << z << endl;
+    cubes.push_back(cube);
     cube_num += 1;
     vector<double> position = {x ,y ,z};
     existCube.push_back(position);
-    cout << cube_num << endl;
     int n = (int)masses.size();
     // int n2 = (int)springs.size();
     // first create 8 masses
@@ -236,15 +320,27 @@ void Robot::updateVertices() {
         }
     }
     for (int i = 0; i < masses.size(); i++) {
-        if(masses[i].p[2] <= 0.12) {
+        if(masses[i].p[2] <= 0.11) {
             cubeColor.push_back(0.2);
             cubeColor.push_back(0.2);
-            cubeColor.push_back(0.9);
+            cubeColor.push_back(0.6);
         }
         else{
             cubeColor.push_back(0.8);
             cubeColor.push_back(0.3);
             cubeColor.push_back(0.4);
+        }
+    }
+    for (int i = 0; i < masses.size(); i++) {
+        if(masses[i].p[2] <= 0.001) {
+            pointColor.push_back(0.9);
+            pointColor.push_back(0.1);
+            pointColor.push_back(0.1);
+        }
+        else {
+            pointColor.push_back(0.1);
+            pointColor.push_back(0.9);
+            pointColor.push_back(0.1);
         }
     }
 }
@@ -525,3 +621,4 @@ vector<Robot> generateRobotGroup2(int robotNum) {
     }
     return res;
 }
+

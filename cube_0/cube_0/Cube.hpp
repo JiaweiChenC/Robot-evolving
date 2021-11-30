@@ -61,13 +61,8 @@ struct Spring
     double c = 0.01;
 };
 
-class Cube {
-public:
-    int index;
-    vector<Mass> cubeMass;
-    vector<Spring> cubeSpring;
-    // constructor
-    Cube(double x, double y, double z);
+struct Cube {
+    vector<double> center = {0, 0, 0};
 };
 
 struct Gene {
@@ -90,11 +85,14 @@ public:
     glm::dvec3 getPosition();
     double getDistance();
     void setDistance();
+    void updateCubeFace();
+    bool checkExist(double x, double y, double z);
     double moveDistance;
     vector<vector<double>> existCube;// use to record where exists a cube, help mutate
     vector<Mass> masses;
     vector<Spring> springs;
     vector<int> imMasses;
+    vector<Cube> cubes;
     int cube_num = 0;
     Gene gene;
     

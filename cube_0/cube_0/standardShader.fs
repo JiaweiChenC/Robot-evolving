@@ -1,7 +1,7 @@
 #version 330 core
 
 // Interpolated values from the vertex shaders
-flat in vec3 fragmentColor;
+in vec3 fragmentColor;
 // don't need color for nwo
 // Ouput data
 out vec3 color;
