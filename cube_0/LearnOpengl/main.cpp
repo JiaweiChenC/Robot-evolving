@@ -14,8 +14,6 @@ using namespace glm;
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-
-Robot robot0(0, 0, 0.1);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -28,7 +26,6 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 int robot_num = 1;
-int mass_num = (int)robot0.masses.size();
 
 // timing
 float deltaTime = 0.0f;    // time between current frame and last frame
@@ -40,16 +37,6 @@ double c = 0.1;
 
 
 bool animation = true;
-
-//vector<GLdouble> cubeVertices(mass_num * 3 * robot_num);
-////GLdouble cubeColor[mass_num * 3 * robot_num]; // cube_count * 64 points * 3 bit
-//vector<GLuint> cubeIndices(cube_num * 36 * robot_num);
-//// cube_count * 6 faces * 2 triangles * 3 indices
-//vector<GLdouble> myEdge_color(cube_num * 24 * robot_num);      // cube_count * 8 points * 3 bit
-//vector<GLuint> myEdge_indices(cube_num * 24 * robot_num); // cube_count * 12 * 2
-//vector<GLdouble> myShade_vertex(cube_num * 24 * robot_num);
-//vector<GLdouble> myShade_color(cube_num * 24 * robot_num);
-//vector<GLuint> myShadeindices(cube_num * 36 * robot_num);
 
 extern vector<GLdouble> cubeColor;
 extern vector<GLdouble> pointColor;
@@ -163,14 +150,25 @@ int main()
 {
     srand(time(0));
     Robot robot0(0, 0, 0.0001);
-    cout << robot0.masses.size() << endl;
-    cout << "consist of :" <<robot0.cube_num << endl;
-    cout << "mass_num: " << mass_num << endl;
+    cout << "masses.size" << robot0.masses.size() << endl;
+    cout << "cube_num :" <<robot0.cube_num << endl;
+    cout << "color size" << cubeColor.size() << endl;
+    cout << "masses indices" << robot0.imMasses.size() << endl;
+    for (const auto& i: robot0.existCube) {
+        cout << "exist: " << i[0] << " " << i[1]  << " " << i[2] <<   " " << endl;
+    }
+    for (int i = 0; i < robot0.imMasses.size(); i++) {
+        if(i % 8 == 0) {
+            cout << endl;
+        }
+        cout << robot0.imMasses[i] << " ";
+    }
     robot0.updateVertices();
     robot0.someStuffToMakesuretheDrawingWroking();
-    for (const auto& i: robot0.existCube) {
-        cout << i[0] << " " << i[1] << ' ' << i[2] << ' ' << endl;
-    }
+    cout << "cube Indices.size: " << cubeIndices.size() << endl;
+//    for (const auto& i: robot0.existCube) {
+//        cout << i[0] << " " << i[1] << ' ' << i[2] << ' ' << endl;
+//    }
     cout << "size: " << cubeIndices.size() << endl;
     cout << "vertices: " << cubeVertices.size() << endl;
     cout << "size is " << robot0.masses.size() << endl;
@@ -187,137 +185,132 @@ int main()
     //    robot8.someStuffToMakesuretheDrawingWroking();
     //    robot0.runningSimulate(2);
     if (animation){
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwInit();
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    // glfw window creation
-    // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
+        // glfw window creation
+        // --------------------
+        GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+        if (window == NULL)
+        {
+            std::cout << "Failed to create GLFW window" << std::endl;
+            glfwTerminate();
+            return -1;
+        }
+        
+        glfwMakeContextCurrent(window);
+        glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+        glfwSetCursorPosCallback(window, mouse_callback);
+        glfwSetScrollCallback(window, scroll_callback);
 
-    // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
-    glEnable(GL_DEPTH_TEST);
-    
-    // build and compile our shader zprogram
-    // ------------------------------------
-    Shader planeShader("cube_0/planeShader.vs", "cube_0/planeShader.fs");
-    Shader skyboxShader("cube_0/skybox.vs", "cube_0/skybox.fs");
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    unsigned int skyboxVAO, skyboxVBO;
-    glGenVertexArrays(1, &skyboxVAO);
-    glGenBuffers(1, &skyboxVBO);
-    glBindVertexArray(skyboxVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    unsigned int floorTexture = loadTexture("resources/textures/bricks2.jpg");
-    vector<std::string> faces
-    {
-        "resources/textures/skybox/right.jpg",
-        "resources/textures/skybox/left.jpg",
-        "resources/textures/skybox/top.jpg",
-        "resources/textures/skybox/bottom.jpg",
-        "resources/textures/skybox/front.jpg",
-        "resources/textures/skybox/back.jpg",
-    };
-    unsigned int cubemapTexture = loadCubemap(faces);
-    skyboxShader.use();
-    skyboxShader.setInt("skybox", 0);    // load and create a texture
-    // -------------------------
-    
-    unsigned int planeVAO, planeVBO;
-    glGenVertexArrays(1, &planeVAO);
-    glGenBuffers(1, &planeVBO);
-    glBindVertexArray(planeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glBindVertexArray(0);
-    
-     //draw cube stuff
-    Shader cubeShader("cube_0/standardShader.vs", "cube_0/standardShader.fs");
-    unsigned int cubeVAO, cubeVBO, cubeEBO;
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &cubeVBO);
-    glGenBuffers(1, &cubeEBO);
-    glBindVertexArray(cubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-    glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
-//        cout << sizeof(cubeVertices) << endl;
-//        cout << cubeVertices.data() << endl;
-//        cout << cubeVertices.size() << endl;
-//        cout << sizeof(cubeIndices) << endl;
-//        cout << sizeof(GLint) << endl;
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices.size() * 4, cubeIndices.data(), GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
-    glEnableVertexAttribArray(0);
-    GLuint colorbufferCube;
-    glGenBuffers(1, &colorbufferCube);
-    glBindBuffer(GL_ARRAY_BUFFER, colorbufferCube);
-    glBufferData(GL_ARRAY_BUFFER, cubeColor.size() * 8, cubeColor.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
-    glEnableVertexAttribArray(1);
-    
-    Shader edgeShader("cube_0/lineShader.vs", "cube_0/lineShader.fs");
-    unsigned int edgeVAO, edgeVBO, edgeEBO;
-    glGenVertexArrays(1, &edgeVAO);
-    glGenBuffers(1, &edgeVBO);
-    glGenBuffers(1, &edgeEBO);
-    glBindVertexArray(edgeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, edgeVBO);
-    glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edgeEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, myEdge_indices.size() * 4, myEdge_indices.data(), GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
-    glEnableVertexAttribArray(0);
+        // tell GLFW to capture our mouse
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        // glad: load all OpenGL function pointers
+        // ---------------------------------------
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        {
+            std::cout << "Failed to initialize GLAD" << std::endl;
+            return -1;
+        }
+        glEnable(GL_DEPTH_TEST);
+        
+        // build and compile our shader zprogram
+        // ------------------------------------
+        Shader planeShader("cube_0/planeShader.vs", "cube_0/planeShader.fs");
+        Shader skyboxShader("cube_0/skybox.vs", "cube_0/skybox.fs");
+        // set up vertex data (and buffer(s)) and configure vertex attributes
+        // ------------------------------------------------------------------
+        unsigned int skyboxVAO, skyboxVBO;
+        glGenVertexArrays(1, &skyboxVAO);
+        glGenBuffers(1, &skyboxVBO);
+        glBindVertexArray(skyboxVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        unsigned int floorTexture = loadTexture("resources/textures/bricks2.jpg");
+        vector<std::string> faces
+        {
+            "resources/textures/skybox/right.jpg",
+            "resources/textures/skybox/left.jpg",
+            "resources/textures/skybox/top.jpg",
+            "resources/textures/skybox/bottom.jpg",
+            "resources/textures/skybox/front.jpg",
+            "resources/textures/skybox/back.jpg",
+        };
+        unsigned int cubemapTexture = loadCubemap(faces);
+        skyboxShader.use();
+        skyboxShader.setInt("skybox", 0);    // load and create a texture
+        // -------------------------
+        
+        unsigned int planeVAO, planeVBO;
+        glGenVertexArrays(1, &planeVAO);
+        glGenBuffers(1, &planeVBO);
+        glBindVertexArray(planeVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        glBindVertexArray(0);
+        
+         //draw cube stuff
+        Shader cubeShader("cube_0/standardShader.vs", "cube_0/standardShader.fs");
+        unsigned int cubeVAO, cubeVBO, cubeEBO;
+        glGenVertexArrays(1, &cubeVAO);
+        glGenBuffers(1, &cubeVBO);
+        glGenBuffers(1, &cubeEBO);
+        glBindVertexArray(cubeVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+        glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
 
-    Shader pointShader("cube_0/pointShader.vs", "cube_0/pointShader.fs");
-    unsigned int pointVAO, pointVBO;
-    glGenVertexArrays(1, &pointVAO);
-    glGenBuffers(1, &pointVBO);
-    glBindVertexArray(pointVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
-    glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
-    glEnableVertexAttribArray(0);
-        cout << "pointcolor:: " << pointColor.size() << endl;
-    GLuint pointColorBuffer;
-    glGenBuffers(1, &pointColorBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, pointColorBuffer);
-    glBufferData(GL_ARRAY_BUFFER, pointColor.size() * 8, pointColor.data(), GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
-    glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices.size() * 4, cubeIndices.data(), GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
+        glEnableVertexAttribArray(0);
+        GLuint colorbufferCube;
+        glGenBuffers(1, &colorbufferCube);
+        glBindBuffer(GL_ARRAY_BUFFER, colorbufferCube);
+        glBufferData(GL_ARRAY_BUFFER, cubeColor.size() * 8, cubeColor.data(), GL_STATIC_DRAW);
+        glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
+        glEnableVertexAttribArray(1);
+        
+        Shader edgeShader("cube_0/lineShader.vs", "cube_0/lineShader.fs");
+        unsigned int edgeVAO, edgeVBO, edgeEBO;
+        glGenVertexArrays(1, &edgeVAO);
+        glGenBuffers(1, &edgeVBO);
+        glGenBuffers(1, &edgeEBO);
+        glBindVertexArray(edgeVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, edgeVBO);
+        glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edgeEBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, myEdge_indices.size() * 4, myEdge_indices.data(), GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
+        glEnableVertexAttribArray(0);
+
+        Shader pointShader("cube_0/pointShader.vs", "cube_0/pointShader.fs");
+        unsigned int pointVAO, pointVBO;
+        glGenVertexArrays(1, &pointVAO);
+        glGenBuffers(1, &pointVBO);
+        glBindVertexArray(pointVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
+        glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
+        glEnableVertexAttribArray(0);
+            cout << "pointcolor:: " << pointColor.size() << endl;
+        GLuint pointColorBuffer;
+        glGenBuffers(1, &pointColorBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, pointColorBuffer);
+        glBufferData(GL_ARRAY_BUFFER, pointColor.size() * 8, pointColor.data(), GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
+        glEnableVertexAttribArray(1);
 
 
     // cubeColor buffer
-            cout << "mass1: " << mass_num << endl;
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -364,7 +357,7 @@ int main()
             glBindVertexArray(0);
             
             model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1, 0, 0));
-            model = glm::translate(model, vec3(-0.5, -0.5, -0.5));
+            model = glm::translate(model, vec3(0.5, -0.5, -0.5));
             
 
             glDepthFunc(GL_ALWAYS);
@@ -377,7 +370,7 @@ int main()
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
             
-            glDepthFunc(GL_LESS);
+            glDepthFunc(GL_ALWAYS);
             edgeShader.use();
             edgeShader.setMat4("MVP", projection * view * model);
             glBindVertexArray(edgeVAO);

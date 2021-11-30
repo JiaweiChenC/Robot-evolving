@@ -183,8 +183,6 @@
 		4E6E0E5F273EDD2D00A66F14 /* Antonio-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Antonio-Light.ttf"; sourceTree = "<group>"; };
 		4E6E0E60273EDD2D00A66F14 /* OCRAEXT.TTF */ = {isa = PBXFileReference; lastKnownFileType = file; path = OCRAEXT.TTF; sourceTree = "<group>"; };
 		4E6E0E61273EDD2D00A66F14 /* Antonio-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Antonio-Bold.ttf"; sourceTree = "<group>"; };
-		4E6E0E63273EDD3400A66F14 /* 3.3.shader.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = 3.3.shader.vs; sourceTree = "<group>"; };
-		4E6E0E64273EDD3400A66F14 /* 3.3.shader.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = 3.3.shader.fs; sourceTree = "<group>"; };
 		4E6E0E69273EDDED00A66F14 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		4E6E0E6B273EDEB800A66F14 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../../../opt/homebrew/Cellar/glfw/3.3.4/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
 		4EBDB916274EC57E00439921 /* planeShader.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = planeShader.vs; sourceTree = "<group>"; };
@@ -308,7 +306,6 @@
 		4E6E0DC5273EDD2D00A66F14 /* resources */ = {
 			isa = PBXGroup;
 			children = (
-				4E6E0E62273EDD3400A66F14 /* shader */,
 				4E6E0DC6273EDD2D00A66F14 /* textures */,
 				4E6E0E0C273EDD2D00A66F14 /* objects */,
 				4E6E0E51273EDD2D00A66F14 /* audio */,
@@ -608,15 +605,6 @@
 			);
 			path = fonts;
 			sourceTree = "<group>";
-		};
-		4E6E0E62273EDD3400A66F14 /* shader */ = {
-			isa = PBXGroup;
-			children = (
-				4E6E0E63273EDD3400A66F14 /* 3.3.shader.vs */,
-				4E6E0E64273EDD3400A66F14 /* 3.3.shader.fs */,
-			);
-			path = shader;
-			sourceTree = SOURCE_ROOT;
 		};
 		4E6E0E68273EDDED00A66F14 /* Frameworks */ = {
 			isa = PBXGroup;

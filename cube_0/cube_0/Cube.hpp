@@ -35,7 +35,6 @@ extern double omega;
 extern double kGround;
 using namespace std;
 extern int robot_num;
-extern int mass_num;
 extern const double crossPro;
 extern const double mutatePro;
 extern const double selectPressure;
