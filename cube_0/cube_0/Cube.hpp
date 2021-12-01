@@ -74,7 +74,8 @@ struct Gene {
 class Robot {
 public:
     // constructor
-    Robot(double x, double y, double z);
+    Robot(double x, double y, double z, int robotSize);
+    Robot(int robotSize, int robotNum);
     void updateRobot();
     void updateVertices();
     void createCube (double x, double y, double z);

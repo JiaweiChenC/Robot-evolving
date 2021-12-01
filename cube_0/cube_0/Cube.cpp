@@ -38,13 +38,13 @@ std::uniform_real_distribution<> dist0(0, 1);
 std::uniform_int_distribution<> dist1(3000, 15000);
 std::uniform_real_distribution<> dist2(-0.01, 0.01);
 using namespace std;
-Robot::Robot(double x, double y, double z){
+Robot::Robot(double x, double y, double z, int robotSize){
     int randomChoiceCube;
     int randomChoiceFace;
     //cout << x << " " << y << " " << z << " " << endl;
     createCube(x, y, z);
 //    cout << "the first cube" << endl;
-    while(cube_num < 20){
+    while(cube_num < robotSize){
         // choose a cube randomly
         randomChoiceCube = rand() % cubes.size();
 //        cout << "random choose cube: " << randomChoiceCube << endl;
@@ -53,68 +53,50 @@ Robot::Robot(double x, double y, double z){
         randomChoiceFace = rand() % 6;
 //        cout << "random choose face: " << randomChoiceFace << endl;
         // generate a cube in front
-        if (randomChoiceFace == 0) {
-            if (checkExist(cube.center[0] + 0.1, cube.center[1], cube.center[2])) {
-                randomChoiceCube = rand() % cubes.size();
-                randomChoiceFace = rand() % 6;
-                cube = cubes[randomChoiceCube];
-            }
-            else {
-            createCube(cube.center[0] + 0.1, cube.center[1], cube.center[2]);
-            }
-        }
-        // generate a cube in back
-        else if (randomChoiceFace == 1) {
-            if (checkExist(cube.center[0] - 0.1, cube.center[1], cube.center[2])) {
-                randomChoiceCube = rand() % cubes.size();
-                randomChoiceFace = rand() % 6;
-                cube = cubes[randomChoiceCube];
-            }
-            else {
-            createCube(cube.center[0] - 0.1, cube.center[1], cube.center[2]);
-            }
-        }
-        // generate a cube in left
-        else if (randomChoiceFace == 2) {
-            if (checkExist(cube.center[0], cube.center[1] + 0.1, cube.center[2])) {
-                randomChoiceCube = rand() % cubes.size();
-                randomChoiceFace = rand() % 6;
-                cube = cubes[randomChoiceCube];
-            }
-            else {
-            createCube(cube.center[0], cube.center[1] + 0.1, cube.center[2]);
-            }
-        }
-        // generate a cube in right
-        else if (randomChoiceFace == 3) {
-            if (checkExist(cube.center[0], cube.center[1] - 0.1, cube.center[2])) {
-                randomChoiceFace = rand() % 6;
-            }
-            else {
-            createCube(cube.center[0], cube.center[1] - 0.1, cube.center[2]);
-            }
-        }
-        // generate a cube top
-        else if (randomChoiceFace == 4) {
-            if (checkExist(cube.center[0], cube.center[1], cube.center[2] + 0.1)) {
-                randomChoiceCube = rand() % cubes.size();
-                randomChoiceFace = rand() % 6;
-                cube = cubes[randomChoiceCube];
-            }
-            else {
-            createCube(cube.center[0], cube.center[1], cube.center[2] + 0.1);
-            }
-        }
-        // generate a cube down
-        else if (randomChoiceFace == 5) {
-            if (checkExist(cube.center[0], cube.center[1], cube.center[2] - 0.1) || cube.center[2] - 0.1<0) {
-                randomChoiceCube = rand() % cubes.size();
-                randomChoiceFace = rand() % 6;
-                cube = cubes[randomChoiceCube];
-            }
-            else {
-            createCube(cube.center[0], cube.center[1], cube.center[2] - 0.1);
-            }
+        switch (randomChoiceFace) {
+            case 0:
+                if (checkExist(cube.center[0] + 0.1, cube.center[1], cube.center[2])) break;
+                else {
+                    createCube(cube.center[0] + 0.1, cube.center[1], cube.center[2]);
+                    break;
+                }
+
+            case 1:
+                if (checkExist(cube.center[0] - 0.1, cube.center[1], cube.center[2])) break;
+                else {
+                    createCube(cube.center[0] - 0.1, cube.center[1], cube.center[2]);
+                    break;
+                }
+                    
+            case 2:
+                if (checkExist(cube.center[0], cube.center[1] + 0.1, cube.center[2])) break;
+                else {
+                    createCube(cube.center[0], cube.center[1] + 0.1, cube.center[2]);
+                    break;
+                }
+    
+            case 3:
+                if (checkExist(cube.center[0], cube.center[1] - 0.1, cube.center[2])) break;
+                else {
+                    createCube(cube.center[0], cube.center[1] - 0.1, cube.center[2]);
+                    break;
+                }
+                
+            case 4:
+                if (checkExist(cube.center[0], cube.center[1], cube.center[2] + 0.1)) break;
+                else {
+                    createCube(cube.center[0], cube.center[1], cube.center[2] + 0.1);
+                    break;
+                }
+            case 5:
+                if (checkExist(cube.center[0], cube.center[1], cube.center[2] - 0.1) || cube.center[2] - 0.1<0) break;
+                else {
+                    createCube(cube.center[0], cube.center[1], cube.center[2] - 0.1);
+                    break;
+                }
+
+            default:
+                break;
         }
     }
 
@@ -129,9 +111,7 @@ Robot::Robot(double x, double y, double z){
             gene.c.push_back(dist0(rng) * 2 * M_PI);
             gene.b.push_back(dist2(rng));
         }
-//    cout << gene.k.size() << endl;
-//    cout << gene.c.size() << endl;
-//    cout << gene.b.size() << endl;
+
     }
     startPos = getPosition();
 }
@@ -286,10 +266,10 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
         tempCube[5] = right;
         tempCube[6] = left;
         for (int z = 0; z < 4; z++) {
-            if(abs(masses[upper[z]].p.x - masses[right].p.x) < 0.01 && masses[upper[z]].p.y < masses[right].p.y) {
+            if(abs(masses[upper[z]].p.x - masses[right].p.x) < 0.01 && masses[upper[z]].p.y < masses[right].p.y - 0.05) {
                 tempCube[4] = upper[z];
             }
-            if(masses[upper[z]].p.x < masses[right].p.x && masses[upper[z]].p.y < masses[right].p.y) {
+            if(masses[upper[z]].p.x < masses[right].p.x - 0.05 && masses[upper[z]].p.y < masses[right].p.y -0.05) {
                 tempCube[7] = upper[z];
             }
         }
@@ -409,11 +389,23 @@ void Robot::updateRobot() {
         }
         masses[i].force += GRAVITY * MASS;
         if(masses[i].p.z < 0) {
+            glm::dvec3 frictionDirection(0.0);
+            // static friction
+            if (masses[i].v[0] == 0 && masses[i].v[1] == 0) {
+                if (masses[i].force[0] == 0 && masses[i].force[1] == 0) {
+                    frictionDirection = glm::dvec3(0, 0, 0);
+                } else {
+                    frictionDirection = glm::normalize(glm::dvec3(-masses[i].force[0], -masses[i].force[1], 0));
+                }
+            }
+            // move friction
+            else {
+                frictionDirection = glm::normalize(glm::dvec3(-masses[i].v.x, -masses[i].v.y, 0));
+            }
             double F_c = -kGround * masses[i].p.z;
             masses[i].force.z += F_c;
             glm::dvec3 frictionForce(0.0);
-            glm::dvec3 frictionDirection(0.0);
-            frictionDirection = glm::normalize(glm::dvec3(-masses[i].v.x, -masses[i].v.y, 0));
+            cout << "friction" << frictionDirection.x << "  " << frictionDirection.y << "  " << frictionDirection.z << " ";
             frictionForce = frictionDirection * F_c * mu;
             masses[i].force += frictionForce;
         }
@@ -471,7 +463,7 @@ void Robot::setDistance() {
 vector<Robot> generateRobotGroup(int robotNum) {
     vector<Robot> robotGroup;
     for (int i = 0; i < robotNum; i++) {
-        Robot robot(0, 0, 0.01);
+        Robot robot(0, 0, 0.01, 20);
         robotGroup.push_back(robot);
     }
     return robotGroup;
@@ -563,7 +555,7 @@ void selection(vector<Robot>& robotGroup) {
     
     // shoud be 0.1 in total
     while (nextGeneration.size() < popSize) {
-        Robot robot(0, 0, 0.01);
+        Robot robot(0, 0, 0.01, 20);
         robot.setDistance();
         runningSimulate(robot, 2);
         nextGeneration.push_back(robot);
@@ -629,12 +621,4 @@ vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotRetur
     return returnRobot;
 }
 
-vector<Robot> generateRobotGroup2(int robotNum) {
-    vector<Robot> res;
-    for (int i = 0; i < robotNum;  i ++) {
-        Robot robot(double(i)/20, 0, 0.1);
-        res.push_back(robot);
-    }
-    return res;
-}
 
