@@ -44,7 +44,7 @@ Robot::Robot(double x, double y, double z){
     cout << x << " " << y << " " << z << " " << endl;
     createCube(x, y, z);
     cout << "the first cube" << endl;
-    while(cube_num < 20){
+    while(cube_num < 0){
         // choose a cube randomly
         randomChoiceCube = rand() % cubes.size();
         cout << "random choose cube: " << randomChoiceCube << endl;
@@ -148,10 +148,10 @@ bool Robot::checkExist(double x, double y, double z) {
 
 void Robot::createCube (double x, double y, double z) {
     Cube cube;
-    cout << "cube num" << cubes.size() << endl;
+//    cout << "cube num" << cubes.size() << endl;
     // this center is a center of xy face
     cube.center = {x, y, z};
-    cout << "x: " << x << " y: " << y << " z: " << z << endl;
+//    cout << "x: " << x << " y: " << y << " z: " << z << endl;
     cubes.push_back(cube);
     cube_num += 1;
     vector<double> position = {x ,y ,z};
@@ -160,14 +160,14 @@ void Robot::createCube (double x, double y, double z) {
     // int n2 = (int)springs.size();
     // first create 8 masses
     vector<Mass> tempMasses(8);
-    tempMasses[0] = {MASS,{x+LENGTH/2,y+LENGTH/2,z},{0,0,0},{0,0,0}};
-    tempMasses[1] = {MASS,{x+LENGTH/2,y-LENGTH/2,z},{0,0,0},{0,0,0}};
-    tempMasses[2] = {MASS,{x-LENGTH/2,y-LENGTH/2,z},{0,0,0},{0,0,0}};
-    tempMasses[3] = {MASS,{x-LENGTH/2,y+LENGTH/2,z},{0,0,0},{0,0,0}};
-    tempMasses[4] = {MASS,{x+LENGTH/2,y+LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
-    tempMasses[5] = {MASS,{x+LENGTH/2,y-LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
-    tempMasses[6] = {MASS,{x-LENGTH/2,y-LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
-    tempMasses[7] = {MASS,{x-LENGTH/2,y+LENGTH/2,z+LENGTH},{0,0,0},{0,0,0}};
+    tempMasses[0] = {MASS,{x+LENGTH/2,y+LENGTH/2,z},{0,0,0},{0,0,0},{0,0,0}};
+    tempMasses[1] = {MASS,{x+LENGTH/2,y-LENGTH/2,z},{0,0,0},{0,0,0},{0,0,0}};
+    tempMasses[2] = {MASS,{x-LENGTH/2,y-LENGTH/2,z},{0,0,0},{0,0,0},{0,0,0}};
+    tempMasses[3] = {MASS,{x-LENGTH/2,y+LENGTH/2,z},{0,0,0},{0,0,0},{0,0,0}};
+    tempMasses[4] = {MASS,{x+LENGTH/2,y+LENGTH/2,z+LENGTH},{0,0,0},{0,0,0},{0,0,0}};
+    tempMasses[5] = {MASS,{x+LENGTH/2,y-LENGTH/2,z+LENGTH},{0,0,0},{0,0,0},{0,0,0}};
+    tempMasses[6] = {MASS,{x-LENGTH/2,y-LENGTH/2,z+LENGTH},{0,0,0},{0,0,0},{0,0,0}};
+    tempMasses[7] = {MASS,{x-LENGTH/2,y+LENGTH/2,z+LENGTH},{0,0,0},{0,0,0},{0,0,0}};
     
     // check the mass created if coinciding with the previous cube if is
     // make m = 0 coinciding pushback the mass overlap, imMasses pushback
@@ -240,7 +240,7 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
             tempCube.push_back(imMasses[8 * i + j]);
         }
         for (int n = 0; n < 8; n++) {
-            if (abs(masses[tempCube[n]].p.z - masses[tempCube[0]].p.z) < 0.001){
+            if (abs(masses[tempCube[n]].p.z - masses[tempCube[0]].p.z) < 0.01){
                 upper.push_back(tempCube[n]);
             }
             else {
@@ -258,7 +258,7 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
         }
         
         for (int n = 0; n < 4; n++) {
-            if (abs(masses[upper[n]].p.y - masses[upper[0]].p.y) < 0.001) {
+            if (abs(masses[upper[n]].p.y - masses[upper[0]].p.y) < 0.01) {
                 front.push_back(upper[n]);
             }
             else {
@@ -334,21 +334,31 @@ void Robot::updateVertices() {
     for (int i = 0; i < masses.size(); i++) {
         for (int j = 0; j < 3; j++) {
             cubeVertices.push_back(masses[i].p[j]);
+            if(masses[i].p[2] <= 0.11) {
+                cubeVertices.push_back(0.2);
+                cubeVertices.push_back(0.2);
+                cubeVertices.push_back(0.6);
+            }
+            else{
+                cubeVertices.push_back(0.8);
+                cubeVertices.push_back(0.3);
+                cubeVertices.push_back(0.4);
+            }
 //            cubeVertices[3 * i + j] = masses[i].p[j];
         }
     }
-    for (int i = 0; i < masses.size(); i++) {
-        if(masses[i].p[2] <= 0.11) {
-            cubeColor.push_back(0.2);
-            cubeColor.push_back(0.2);
-            cubeColor.push_back(0.6);
-        }
-        else{
-            cubeColor.push_back(0.8);
-            cubeColor.push_back(0.3);
-            cubeColor.push_back(0.4);
-        }
-    }
+//    for (int i = 0; i < masses.size(); i++) {
+//        if(masses[i].p[2] <= 0.11) {
+//            cubeColor.push_back(0.2);
+//            cubeColor.push_back(0.2);
+//            cubeColor.push_back(0.6);
+//        }
+//        else{
+//            cubeColor.push_back(0.8);
+//            cubeColor.push_back(0.3);
+//            cubeColor.push_back(0.4);
+//        }
+//    }
     for (int i = 0; i < masses.size(); i++) {
         if(masses[i].p[2] <= 0.001) {
             pointColor.push_back(0.1);
@@ -374,7 +384,7 @@ void Robot::breathing() {
 //                springs[20 * i + j].c = gene.c[i];
 //            }
 //    }
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 28; i++) {
     springs[i].L0 = springs[i].a + springs[i].b * sin(omega * T + springs[i].c);
     }
 }
