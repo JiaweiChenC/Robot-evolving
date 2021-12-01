@@ -41,17 +41,17 @@ using namespace std;
 Robot::Robot(double x, double y, double z){
     int randomChoiceCube;
     int randomChoiceFace;
-    cout << x << " " << y << " " << z << " " << endl;
+    //cout << x << " " << y << " " << z << " " << endl;
     createCube(x, y, z);
     cout << "the first cube" << endl;
-    while(cube_num < 10){
+    while(cube_num < 20){
         // choose a cube randomly
         randomChoiceCube = rand() % cubes.size();
-        cout << "random choose cube: " << randomChoiceCube << endl;
+//        cout << "random choose cube: " << randomChoiceCube << endl;
         Cube cube = cubes[randomChoiceCube];
         // choose a face randomly
         randomChoiceFace = rand() % 6;
-        cout << "random choose face: " << randomChoiceFace << endl;
+//        cout << "random choose face: " << randomChoiceFace << endl;
         // generate a cube in front
         if (randomChoiceFace == 0) {
             if (checkExist(cube.center[0] + 0.1, cube.center[1], cube.center[2])) {
@@ -148,10 +148,10 @@ bool Robot::checkExist(double x, double y, double z) {
 
 void Robot::createCube (double x, double y, double z) {
     Cube cube;
-    cout << "cube num" << cubes.size() << endl;
+    //cout << "cube num" << cubes.size() << endl;
     // this center is a center of xy face
     cube.center = {x, y, z};
-    cout << "x: " << x << " y: " << y << " z: " << z << endl;
+    //cout << "x: " << x << " y: " << y << " z: " << z << endl;
     cubes.push_back(cube);
     cube_num += 1;
     vector<double> position = {x ,y ,z};
@@ -218,13 +218,13 @@ void Robot::createCube (double x, double y, double z) {
         spring.L0 = distance(masses[spring.m1].p, masses[spring.m2].p);
         spring.a= distance(masses[spring.m1].p, masses[spring.m2].p);
     }
-    cout << "coinciding: " << coinciding.size() << endl;
-    cout << "imMasses: ";
-    for (const auto& i: imMasses) {
-        cout  << i << " " ;
-    }
+    //cout << "coinciding: " << coinciding.size() << endl;
+    //cout << "imMasses: ";
+//    for (const auto& i: imMasses) {
+//        cout  << i << " " ;
+//    }
     cout << endl;
-    cout << "imMasses size: " << imMasses.size() << endl;
+    //cout << "imMasses size: " << imMasses.size() << endl;
 }
 
 void Robot::someStuffToMakesuretheDrawingWroking() {
@@ -308,10 +308,10 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
                 tempCube[3] = down[p];
             }
         }
-        cout << "tempCube: ";
+//        cout << "tempCube: ";
         for (int j = 0; j < 8; j++) {
             imMasses[8 * i + j] = tempCube[j];
-            cout << tempCube[j] <<" " ;
+//            cout << tempCube[j] <<" " ;
         };
         cout << endl;
         
@@ -442,7 +442,7 @@ void runningSimulate(Robot& robot, double runningTime) {
     }
     tempRobot.setDistance();
     robot.moveDistance = tempRobot.getDistance();
-    std::cout << "distance running: " << robot.moveDistance << endl;
+    //std::cout << "distance running: " << robot.moveDistance << endl;
 }
 
 bool Robot::theSame(Mass m1, Mass m2){
