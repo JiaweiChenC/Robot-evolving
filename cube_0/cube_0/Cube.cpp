@@ -44,7 +44,7 @@ Robot::Robot(double x, double y, double z){
     cout << x << " " << y << " " << z << " " << endl;
     createCube(x, y, z);
     cout << "the first cube" << endl;
-    while(cube_num < 0){
+    while(cube_num < 10){
         // choose a cube randomly
         randomChoiceCube = rand() % cubes.size();
         cout << "random choose cube: " << randomChoiceCube << endl;
@@ -148,10 +148,10 @@ bool Robot::checkExist(double x, double y, double z) {
 
 void Robot::createCube (double x, double y, double z) {
     Cube cube;
-//    cout << "cube num" << cubes.size() << endl;
+    cout << "cube num" << cubes.size() << endl;
     // this center is a center of xy face
     cube.center = {x, y, z};
-//    cout << "x: " << x << " y: " << y << " z: " << z << endl;
+    cout << "x: " << x << " y: " << y << " z: " << z << endl;
     cubes.push_back(cube);
     cube_num += 1;
     vector<double> position = {x ,y ,z};
@@ -334,31 +334,21 @@ void Robot::updateVertices() {
     for (int i = 0; i < masses.size(); i++) {
         for (int j = 0; j < 3; j++) {
             cubeVertices.push_back(masses[i].p[j]);
-            if(masses[i].p[2] <= 0.11) {
-                cubeVertices.push_back(0.2);
-                cubeVertices.push_back(0.2);
-                cubeVertices.push_back(0.6);
-            }
-            else{
-                cubeVertices.push_back(0.8);
-                cubeVertices.push_back(0.3);
-                cubeVertices.push_back(0.4);
-            }
 //            cubeVertices[3 * i + j] = masses[i].p[j];
         }
     }
-//    for (int i = 0; i < masses.size(); i++) {
-//        if(masses[i].p[2] <= 0.11) {
-//            cubeColor.push_back(0.2);
-//            cubeColor.push_back(0.2);
-//            cubeColor.push_back(0.6);
-//        }
-//        else{
-//            cubeColor.push_back(0.8);
-//            cubeColor.push_back(0.3);
-//            cubeColor.push_back(0.4);
-//        }
-//    }
+    for (int i = 0; i < masses.size(); i++) {
+        if(masses[i].p[2] <= 0.11) {
+            cubeColor.push_back(0.2);
+            cubeColor.push_back(0.2);
+            cubeColor.push_back(0.6);
+        }
+        else{
+            cubeColor.push_back(0.8);
+            cubeColor.push_back(0.3);
+            cubeColor.push_back(0.4);
+        }
+    }
     for (int i = 0; i < masses.size(); i++) {
         if(masses[i].p[2] <= 0.001) {
             pointColor.push_back(0.1);
