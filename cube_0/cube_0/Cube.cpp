@@ -43,7 +43,7 @@ Robot::Robot(double x, double y, double z){
     int randomChoiceFace;
     //cout << x << " " << y << " " << z << " " << endl;
     createCube(x, y, z);
-    cout << "the first cube" << endl;
+//    cout << "the first cube" << endl;
     while(cube_num < 20){
         // choose a cube randomly
         randomChoiceCube = rand() % cubes.size();
@@ -139,7 +139,7 @@ Robot::Robot(double x, double y, double z){
 bool Robot::checkExist(double x, double y, double z) {
     bool exist = false;
     for (const auto& position: existCube){
-        if ((abs(position[0] - x) < 0.0001 && abs(position[1]- y) < 0.0001 && abs(position[2] - z) < 0.0001)) {
+        if ((abs(position[0] - x) < 0.001 && abs(position[1]- y) < 0.001 && abs(position[2] - z) < 0.001)) {
             exist = true;
         }
     }
@@ -223,7 +223,6 @@ void Robot::createCube (double x, double y, double z) {
 //    for (const auto& i: imMasses) {
 //        cout  << i << " " ;
 //    }
-    cout << endl;
     //cout << "imMasses size: " << imMasses.size() << endl;
 }
 
@@ -287,7 +286,7 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
         tempCube[5] = right;
         tempCube[6] = left;
         for (int z = 0; z < 4; z++) {
-            if(abs(masses[upper[z]].p.x - masses[right].p.x) < 0.001 && masses[upper[z]].p.y < masses[right].p.y) {
+            if(abs(masses[upper[z]].p.x - masses[right].p.x) < 0.01 && masses[upper[z]].p.y < masses[right].p.y) {
                 tempCube[4] = upper[z];
             }
             if(masses[upper[z]].p.x < masses[right].p.x && masses[upper[z]].p.y < masses[right].p.y) {
@@ -295,16 +294,16 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
             }
         }
         for (int p = 0; p < 4; p++) {
-            if(abs(masses[down[p]].p.x - masses[tempCube[4]].p.x) < 0.001 && abs(masses[down[p]].p.y - masses[tempCube[4]].p.y) < 0.001){
+            if(abs(masses[down[p]].p.x - masses[tempCube[4]].p.x) < 0.01 && abs(masses[down[p]].p.y - masses[tempCube[4]].p.y) < 0.01){
                 tempCube[0] = down[p];
             }
-            if(abs(masses[down[p]].p.x - masses[tempCube[5]].p.x) < 0.001 && abs(masses[down[p]].p.y - masses[tempCube[5]].p.y) < 0.001){
+            if(abs(masses[down[p]].p.x - masses[tempCube[5]].p.x) < 0.01 && abs(masses[down[p]].p.y - masses[tempCube[5]].p.y) < 0.01){
                 tempCube[1] = down[p];
             }
-            if(abs(masses[down[p]].p.x - masses[tempCube[6]].p.x) < 0.001 && abs(masses[down[p]].p.y - masses[tempCube[6]].p.y) < 0.001){
+            if(abs(masses[down[p]].p.x - masses[tempCube[6]].p.x) < 0.01 && abs(masses[down[p]].p.y - masses[tempCube[6]].p.y) < 0.01){
                 tempCube[2] = down[p];
             }
-            if(abs(masses[down[p]].p.x - masses[tempCube[7]].p.x) < 0.001 && abs(masses[down[p]].p.y - masses[tempCube[7]].p.y) < 0.001){
+            if(abs(masses[down[p]].p.x - masses[tempCube[7]].p.x) < 0.01 && abs(masses[down[p]].p.y - masses[tempCube[7]].p.y) < 0.01){
                 tempCube[3] = down[p];
             }
         }
@@ -313,7 +312,6 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
             imMasses[8 * i + j] = tempCube[j];
 //            cout << tempCube[j] <<" " ;
         };
-        cout << endl;
         
         for (int k = 0; k < 12; k++) {
             cubeIndices.push_back(tempCube[faceIndices[k][0]]);

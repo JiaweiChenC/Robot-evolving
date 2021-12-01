@@ -154,9 +154,13 @@ int main()
     srand(time(0));
     Robot robot0(0.0, 0.0, 0.0001);
     Robot robot1(-1.0, 0.0, 0.0001);
-    Robot robot2(-2.0, 0.0, 0.0001);
-    Robot robot3(-3.0, 0.0, 0.0001);
-    Robot robot4(-4.0, 0.0, 0.0001);
+    Robot robot2(1.0, 0.0, 0.0001);
+    Robot robot3(0.0, 1.0, 0.0001);
+    Robot robot4(-1.0, 1.0, 0.0001);
+    Robot robot5(1.0, 1.0, 0.0001);
+    Robot robot6(0.0, 2.0, 0.0001);
+    Robot robot7(-1.0, 2.0, 0.0001);
+    Robot robot8(1.0, 2.0, 0.0001);
     vector<Robot> cubeGroup;
     cubeGroup.push_back(robot0);
     cubeGroup.push_back(robot1);
@@ -168,6 +172,7 @@ int main()
         cout << "robot " << num << ": " << endl;
         for(const auto& position: cube.existCube) {
             cout << position[0] << " " << position[1] << " " << position[2] << endl;
+            num += 1;
         }
     }
 //    cout << "masses.size" << robot0.masses.size() << endl;
@@ -221,6 +226,36 @@ int main()
     edgeIndicesGroup.push_back(myEdge_indices);
     cubeIndices.clear();
     myEdge_indices.clear();
+    
+    robot5.updateVertices();
+    robot5.someStuffToMakesuretheDrawingWroking();
+    cubeIndicesGroup.push_back(cubeIndices);
+    edgeIndicesGroup.push_back(myEdge_indices);
+    cubeIndices.clear();
+    myEdge_indices.clear();
+    
+    robot6.updateVertices();
+    robot6.someStuffToMakesuretheDrawingWroking();
+    cubeIndicesGroup.push_back(cubeIndices);
+    edgeIndicesGroup.push_back(myEdge_indices);
+    cubeIndices.clear();
+    myEdge_indices.clear();
+    
+    robot7.updateVertices();
+    robot7.someStuffToMakesuretheDrawingWroking();
+    cubeIndicesGroup.push_back(cubeIndices);
+    edgeIndicesGroup.push_back(myEdge_indices);
+    cubeIndices.clear();
+    myEdge_indices.clear();
+    
+    robot8.updateVertices();
+    robot8.someStuffToMakesuretheDrawingWroking();
+    cubeIndicesGroup.push_back(cubeIndices);
+    edgeIndicesGroup.push_back(myEdge_indices);
+    cubeIndices.clear();
+    myEdge_indices.clear();
+    
+    
 //    cout << "group size: " << cubeIndicesGroup.size() << endl;
 //    cout <<" _____________ "<<cubeIndices.size() << endl;
 //    cout << "cube Indices.size: " << cubeIndices.size() << endl;
@@ -309,10 +344,10 @@ int main()
          //draw cube stuff
         Shader cubeShader("cube_0/standardShader.vs", "cube_0/standardShader.fs");
         //unsigned int cubeVAO, cubeVBO, cubeEBO;
-        vector<GLuint> cubeVAO(5);
-        vector<GLuint> cubeVBO(5);
-        vector<GLuint> cubeEBO(5);
-        for (int i = 0; i < 5; i++) {
+        vector<GLuint> cubeVAO(9);
+        vector<GLuint> cubeVBO(9);
+        vector<GLuint> cubeEBO(9);
+        for (int i = 0; i < 9; i++) {
             glGenVertexArrays(1, &cubeVAO[i]);
             glGenBuffers(1, &cubeVBO[i]);
             glGenBuffers(1, &cubeEBO[i]);
@@ -334,10 +369,10 @@ int main()
         
         Shader edgeShader("cube_0/lineShader.vs", "cube_0/lineShader.fs");
         
-        vector<GLuint> edgeVAO(5);
-        vector<GLuint> edgeVBO(5);
-        vector<GLuint> edgeEBO(5);
-        for (int i = 0; i < 5; i++) {
+        vector<GLuint> edgeVAO(9);
+        vector<GLuint> edgeVBO(9);
+        vector<GLuint> edgeEBO(9);
+        for (int i = 0; i < 9; i++) {
             glGenVertexArrays(1, &edgeVAO[i]);
             glGenBuffers(1, &edgeVBO[i]);
             glGenBuffers(1, &edgeEBO[i]);
@@ -627,6 +662,177 @@ int main()
             cubeColor.clear();
             cubeIndices.clear();
             
+            
+            robot5.updateRobot();
+            robot5.updateVertices();
+            robot5.breathing();
+            
+            glDepthFunc(GL_ALWAYS);
+            cubeShader.use();
+            cubeShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(cubeVAO[5]);
+            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO[5]);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawElements(GL_TRIANGLES, 12 * 3 * robot0.cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            glDepthFunc(GL_ALWAYS);
+            edgeShader.use();
+            edgeShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(edgeVAO[5]);
+            glBindBuffer(GL_ARRAY_BUFFER, edgeVBO[5]);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawElements(GL_LINES, 12 * 2 * robot0.cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            glDepthFunc(GL_ALWAYS);
+            glPointSize(7.0f);
+            pointShader.use();
+            pointShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(pointVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, pointColorBuffer);
+            glBufferData(GL_ARRAY_BUFFER, pointColor.size() * 8, pointColor.data(), GL_DYNAMIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawArrays(GL_POINTS, 0, (int)robot3.masses.size());// 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            cubeVertices.clear();
+            pointColor.clear();
+            cubeColor.clear();
+            cubeIndices.clear();
+            
+            
+            robot6.updateRobot();
+            robot6.updateVertices();
+            robot6.breathing();
+            
+            glDepthFunc(GL_ALWAYS);
+            cubeShader.use();
+            cubeShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(cubeVAO[6]);
+            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO[6]);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawElements(GL_TRIANGLES, 12 * 3 * robot0.cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            glDepthFunc(GL_ALWAYS);
+            edgeShader.use();
+            edgeShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(edgeVAO[6]);
+            glBindBuffer(GL_ARRAY_BUFFER, edgeVBO[6]);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawElements(GL_LINES, 12 * 2 * robot0.cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            glDepthFunc(GL_ALWAYS);
+            glPointSize(7.0f);
+            pointShader.use();
+            pointShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(pointVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, pointColorBuffer);
+            glBufferData(GL_ARRAY_BUFFER, pointColor.size() * 8, pointColor.data(), GL_DYNAMIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawArrays(GL_POINTS, 0, (int)robot3.masses.size());// 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            cubeVertices.clear();
+            pointColor.clear();
+            cubeColor.clear();
+            cubeIndices.clear();
+            
+            
+            robot7.updateRobot();
+            robot7.updateVertices();
+            robot7.breathing();
+            
+            glDepthFunc(GL_ALWAYS);
+            cubeShader.use();
+            cubeShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(cubeVAO[7]);
+            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO[7]);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawElements(GL_TRIANGLES, 12 * 3 * robot0.cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            glDepthFunc(GL_ALWAYS);
+            edgeShader.use();
+            edgeShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(edgeVAO[7]);
+            glBindBuffer(GL_ARRAY_BUFFER, edgeVBO[7]);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawElements(GL_LINES, 12 * 2 * robot0.cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            glDepthFunc(GL_ALWAYS);
+            glPointSize(7.0f);
+            pointShader.use();
+            pointShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(pointVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, pointColorBuffer);
+            glBufferData(GL_ARRAY_BUFFER, pointColor.size() * 8, pointColor.data(), GL_DYNAMIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawArrays(GL_POINTS, 0, (int)robot3.masses.size());// 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            cubeVertices.clear();
+            pointColor.clear();
+            cubeColor.clear();
+            cubeIndices.clear();
+            
+            
+            robot8.updateRobot();
+            robot8.updateVertices();
+            robot8.breathing();
+            
+            glDepthFunc(GL_ALWAYS);
+            cubeShader.use();
+            cubeShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(cubeVAO[8]);
+            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO[8]);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawElements(GL_TRIANGLES, 12 * 3 * robot0.cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            glDepthFunc(GL_ALWAYS);
+            edgeShader.use();
+            edgeShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(edgeVAO[8]);
+            glBindBuffer(GL_ARRAY_BUFFER, edgeVBO[8]);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawElements(GL_LINES, 12 * 2 * robot0.cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            glDepthFunc(GL_ALWAYS);
+            glPointSize(7.0f);
+            pointShader.use();
+            pointShader.setMat4("MVP", projection * view * model);
+            glBindVertexArray(pointVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, pointColorBuffer);
+            glBufferData(GL_ARRAY_BUFFER, pointColor.size() * 8, pointColor.data(), GL_DYNAMIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
+            glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
+            glDrawArrays(GL_POINTS, 0, (int)robot3.masses.size());// 12 triangle 3 points 27 cube
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            
+            cubeVertices.clear();
+            pointColor.clear();
+            cubeColor.clear();
+            cubeIndices.clear();
             
             glDepthFunc(GL_EQUAL);
             skyboxShader.use();
