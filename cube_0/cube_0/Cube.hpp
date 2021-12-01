@@ -18,6 +18,7 @@
 #include <fstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 extern const double MASS;
 extern double LENGTH;
 extern glm::dvec3 GRAVITY;
@@ -52,7 +53,7 @@ struct Mass
 
 struct Spring
 {
-    double k = 12000;       // spring constant
+    double k = 10000;       // spring constant
     double L0;      // original length
     int m1;         // connected mass 1
     int m2;         // connected mass 2
@@ -87,6 +88,7 @@ public:
     double getDistance();
     void setDistance();
     void updateCubeFace();
+    void mutate();
     bool checkExist(double x, double y, double z);
     double moveDistance;
     vector<vector<double>> existCube;// use to record where exists a cube, help mutate
@@ -104,7 +106,7 @@ private:
 
 vector<Robot> generateRobotGroup(int robotNum);
 vector<Robot> generateRobotGroup2(int robotNum);
-void mutateRobot(vector<Robot>& robotGroup);
+void mutateRobot(Robot robot);
 void selection(vector<Robot>& robotGroup);
 vector<Robot> crossoverRobot(Robot parent1, Robot parent2);
 double getDiversity(vector<Robot>& robotGroup);

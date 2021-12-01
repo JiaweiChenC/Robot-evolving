@@ -152,15 +152,16 @@ vector<vector<GLuint>> edgeIndices{
 int main()
 {
 //    srand(time(0));
-    Robot robot0(0.0, 0.0, 0.0001, 20);
-    Robot robot1(-1, 0.0, 0.0001, 20);
-    Robot robot2(-2, 0.0, 0.0001, 20);
-    Robot robot3(-3, 0.0, 0.0001, 20);
-    Robot robot4(1.0, 0.0, 0.0001, 20);
-    Robot robot5(2.0, 0.0, 0.0001, 20);
-    Robot robot6(3.0, 0.0, 0.0001, 20);
-    Robot robot7(4.0, 0.0, 0.0001, 20);
-    Robot robot8(-4.0, 0.0, 0.0001, 20);
+    Robot robot0(0.0, 0.0, 0.0001, 2);
+    Robot robot1(-1, 0.0, 0.0001, 2);
+    Robot robot2(-2, 0.0, 0.0001, 2);
+    Robot robot3(-3, 0.0, 0.0001, 2);
+    Robot robot4(1.0, 0.0, 0.0001, 2);
+    Robot robot5(2.0, 0.0, 0.0001, 2);
+    Robot robot6(3.0, 0.0, 0.0001, 2);
+    Robot robot7(4.0, 0.0, 0.0001, 2);
+    Robot robot8(-4.0, 0.0, 0.0001, 2);
+
     vector<Robot> robotGroup;
     robotGroup.push_back(robot0);
     robotGroup.push_back(robot1);
@@ -172,20 +173,20 @@ int main()
     robotGroup.push_back(robot7);
     robotGroup.push_back(robot8);
 
-    int num = 0;
-    for (const auto& cube: robotGroup) {
-        cout << "robot " << num << ": " << endl;
-        for(const auto& position: cube.existCube) {
-            cout << position[0] << " " << position[1] << " " << position[2] << endl;
-            num += 1;
-        }
-    }
-    for (const auto& robot: robotGroup) {
-        cout << robot.masses.size() << endl;
-    }
+//    int num = 0;
+//    for (const auto& cube: robotGroup) {
+//        cout << "robot " << num << ": " << endl;
+//        for(const auto& position: cube.existCube) {
+//            cout << position[0] << " " << position[1] << " " << position[2] << endl;
+//            num += 1;
+//        }
+//    }
+//    for (const auto& robot: robotGroup) {
+//        cout << robot.masses.size() << endl;
+//    }
 //    cout << "masses.size" << robot0.masses.size() << endl;
 //    cout << "cube_num :" <<robot0.cube_num << endl;
-//    cout << "color size" << cubeColor.size() << endl;
+//    cout << "color size" << cubeCoslor.size() << endl;
 //    cout << "masses indices" << robot0.imMasses.size() << endl;
 //    for (const auto& i: robot1.masses) {
 //        cout << i.p[0] << " " << i.p[1] << " " << i.p[2] << " " << endl;
@@ -308,8 +309,8 @@ int main()
             glBindVertexArray(cubeVAO[i]);
             glBindBuffer(GL_ARRAY_BUFFER, cubeVBO[i]);
             assert(cubeVertices.size() != 0);
-            cout << "i: " << cubeVertices.size() << endl;
-            cout << "I: " << cubeVertices.data() << endl;
+//            cout << "i: " << cubeVertices.size() << endl;
+//            cout << "I: " << cubeVertices.data() << endl;
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO[i]);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndicesGroup[i].size() * 4, cubeIndicesGroup[i].data(), GL_DYNAMIC_DRAW);
@@ -414,7 +415,7 @@ int main()
                 glBindVertexArray(cubeVAO[i]);
                 glBindBuffer(GL_ARRAY_BUFFER, cubeVBO[i]);
                 glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
-                glDrawElements(GL_TRIANGLES, 12 * 3 * robot0.cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+                glDrawElements(GL_TRIANGLES, 12 * 3 * robotGroup[i].cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
                 glBindVertexArray(0);
                 
@@ -424,7 +425,7 @@ int main()
                 glBindVertexArray(edgeVAO[i]);
                 glBindBuffer(GL_ARRAY_BUFFER, edgeVBO[i]);
                 glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
-                glDrawElements(GL_LINES, 12 * 2 * robot0.cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+                glDrawElements(GL_LINES, 12 * 2 * robotGroup[i].cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
                 glBindVertexArray(0);
                 
@@ -441,7 +442,7 @@ int main()
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
                 glBindVertexArray(0);
                 
-                cout << i << "  "<<  robotGroup[i].getPosition()[0]<< " " << robotGroup[i].getPosition()[1] <<" " <<  robotGroup[i].getPosition()[2] << endl;
+//                cout << i << "  "<<  robotGroup[i].getPosition()[0]<< " " << robotGroup[i].getPosition()[1] <<" " <<  robotGroup[i].getPosition()[2] << endl;
                 cubeVertices.clear();
                 pointColor.clear();
                 cubeColor.clear();

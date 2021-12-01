@@ -116,6 +116,71 @@ Robot::Robot(double x, double y, double z, int robotSize){
     startPos = getPosition();
 }
 
+void Robot::mutate() {
+    int mutate = 0;
+    while(mutate < 1){
+        // choose a cube randomly
+        int randomChoiceCube, randomChoiceFace;
+        randomChoiceCube = rand() % cubes.size();
+//        cout << "random choose cube: " << randomChoiceCube << endl;
+        Cube cube = cubes[randomChoiceCube];
+        // choose a face randomly
+        randomChoiceFace = rand() % 6;
+//        cout << "random choose face: " << randomChoiceFace << endl;
+        // generate a cube in front
+        switch (randomChoiceFace) {
+            case 0:
+                if (checkExist(cube.center[0] + 0.1, cube.center[1], cube.center[2])) break;
+                else {
+                    createCube(cube.center[0] + 0.1, cube.center[1], cube.center[2]);
+                    mutate += 1;
+                    break;
+                }
+
+            case 1:
+                if (checkExist(cube.center[0] - 0.1, cube.center[1], cube.center[2])) break;
+                else {
+                    createCube(cube.center[0] - 0.1, cube.center[1], cube.center[2]);
+                    mutate += 1;
+                    break;
+                }
+                    
+            case 2:
+                if (checkExist(cube.center[0], cube.center[1] + 0.1, cube.center[2])) break;
+                else {
+                    createCube(cube.center[0], cube.center[1] + 0.1, cube.center[2]);
+                    mutate += 1;
+                    break;
+                }
+    
+            case 3:
+                if (checkExist(cube.center[0], cube.center[1] - 0.1, cube.center[2])) break;
+                else {
+                    createCube(cube.center[0], cube.center[1] - 0.1, cube.center[2]);
+                    mutate += 1;
+                    break;
+                }
+                
+            case 4:
+                if (checkExist(cube.center[0], cube.center[1], cube.center[2] + 0.1)) break;
+                else {
+                    createCube(cube.center[0], cube.center[1], cube.center[2] + 0.1);
+                    mutate += 1;
+                    break;
+                }
+            case 5:
+                if (checkExist(cube.center[0], cube.center[1], cube.center[2] - 0.1) || cube.center[2] - 0.1<0) break;
+                else {
+                    createCube(cube.center[0], cube.center[1], cube.center[2] - 0.1);
+                    mutate += 1;
+                    break;
+                }
+            default:
+                break;
+        }
+    }
+}
+
 bool Robot::checkExist(double x, double y, double z) {
     bool exist = false;
     for (const auto& position: existCube){
@@ -405,7 +470,7 @@ void Robot::updateRobot() {
             double F_c = -kGround * masses[i].p.z;
             masses[i].force.z += F_c;
             glm::dvec3 frictionForce(0.0);
-            cout << "friction" << frictionDirection.x << "  " << frictionDirection.y << "  " << frictionDirection.z << " ";
+//            cout << "friction" << frictionDirection.x << "  " << frictionDirection.y << "  " << frictionDirection.z << " ";
             frictionForce = frictionDirection * F_c * mu;
             masses[i].force += frictionForce;
         }
@@ -469,20 +534,8 @@ vector<Robot> generateRobotGroup(int robotNum) {
     return robotGroup;
 }
 
-void mutateRobot(vector<Robot>& robotGroup) {
-    for (Robot& robot: robotGroup){
-        for (int i = 0; i < DIM * DIM; i++) {
-            if (dist0(rng) < mutatePro){
-            robot.gene.k[i] = dist1(rng);
-            }
-        }
-        for (int i = 0; i < DIM * DIM; i++) {
-            if (dist0(rng) < mutatePro){
-            robot.gene.c[i] = (dist0(rng) * 2 * M_PI);
-            robot.gene.b[i] = (dist2(rng));
-            }
-        }
-    }
+void mutateRobot(Robot robot) {
+    return;
 }
 
 vector<Robot> crossoverRobot(Robot parent1, Robot parent2) {
@@ -597,7 +650,6 @@ vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotRetur
         if(record){
             Diversity << diversity << endl;
         }
-        mutateRobot(robotGroup);
         // update the running
         for (Robot& robot: robotGroup) {
             runningSimulate(robot, cycleTime);
