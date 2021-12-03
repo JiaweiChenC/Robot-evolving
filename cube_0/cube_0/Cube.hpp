@@ -58,7 +58,7 @@ struct Mass
 
 struct Spring
 {
-    double k = 10000;       // spring constant
+    double k = 15000;       // spring constant
     double L0;      // original length
     int m1;         // connected mass 1
     int m2;         // connected mass 2
@@ -96,9 +96,10 @@ public:
     bool theSame(Mass m1, Mass m2);
     void breathing();
     void updateSprings();
-    glm::dvec3 getPosition();
+    glm::dvec2 getPosition();
     double getDistance();
     void setDistance();
+    void resetMass();
     void updateCubeFace();
     bool checkExist(double x, double y, double z);
     double moveDistance;
@@ -107,19 +108,18 @@ public:
     vector<Spring> springs;
     vector<int> imMasses;
     vector<Cube> cubes;
+    glm::dvec2 startPos;
+    glm::dvec2 currentPos;
     int cube_num = 0;
     Gene gene;
-    
-private:
-    glm::dvec3 startPos;
-    glm::dvec3 currentPos;
+
 };
 
 Robot mutateRobot(Robot robot);
 void selection(vector<Robot>& robotGroup);
-vector<Robot> crossoverRobotMotor(Robot parent1, Robot parent2);
+//vector<Robot> crossoverRobotMotor(Robot parent1, Robot parent2);
 vector<Robot> crossoverRobot(Robot parent1, Robot parent2);
-double getDiversity(vector<Robot>& robotGroup);
+int getDiversity(vector<Robot>& robotGroup);
 double getGroupDistance(vector<Robot> robot);
 vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotReturn, double cycleTime, bool record);
 void runningSimulate(Robot& robot, double runningTime);

@@ -36,7 +36,7 @@ double b = 0.1;
 double c = 0.1;
 
 
-bool animation = true;
+bool animation = false;
 
 extern vector<GLdouble> cubeColor;
 extern vector<GLdouble> pointColor;
@@ -152,9 +152,10 @@ vector<vector<GLuint>> edgeIndices{
 
 int main()
 {
-//    srand(time(0));
-    Robot robot0(0.0, 0.0, 0.0,40);
-    Robot robot1(0, 0.0, 0.0, 40);
+    srand(time(0));
+    vector<Robot> robots = geneticAlgorithm(20, 10, 10, 2, true);
+    Robot robot0(0.0, 0.0, 0.0,20);
+    Robot robot1(0, 0.0, 0.0, 20);
     Robot robot2(0, 0.0, 0.0, 20);
     Robot robot3(0, 0.0, 0.0, 20);
     Robot robot4(0, 0.0, 0.0, 20);
@@ -174,6 +175,9 @@ int main()
 //    robot0  = deleteCubes(robot0, pos);
 //    for (int i = 0; i < 12 ; i++)
 //    {robot1 = mutateRobot(robot1);}
+//    vector<Robot> child = crossoverRobot(robot0, robot1);
+//    robot1 = child[0];
+//    robot0 = child[1];
     cout << "size: " << robot1.cubes.size() << endl;
     vector<Robot> robotGroup;
     robotGroup.push_back(robot0);
@@ -226,12 +230,12 @@ int main()
     }
     
     
-//    cout << "group size: " << cubeIndicesGroup.size() << endl;
-//    cout <<" _____________ "<<cubeIndices.size() << endl;
-//    cout << "cube Indices.size: " << cubeIndices.size() << endl;
-//    cout << "size: " << cubeIndices.size() << endl;
-//    cout << "vertices: " << cubeVertices.size() << endl;
-//    cout << "size is " << robot0.masses.size() << endl;
+    cout << "group size: " << cubeIndicesGroup.size() << endl;
+    cout <<" _____________ "<<cubeIndices.size() << endl;
+    cout << "cube Indices.size: " << cubeIndices.size() << endl;
+    cout << "size: " << cubeIndices.size() << endl;
+    cout << "vertices: " << cubeVertices.size() << endl;
+    cout << "size is " << robot0.masses.size() << endl;
     //    for (int i = 0; i < robot0.masses.size(); i++) {
     //        cout << "position" << robot0.masses[i].p[0] << ", " << robot0.masses[i].p[1] <<", " << robot0.masses[i].p[2] << endl;
     //    }
@@ -395,6 +399,7 @@ int main()
 //            robot0.runningSimulate(2);
 //            robot0.setDistance();
             T += dt;
+            cout << "global Time: " << T << endl;
 //            cout << "global time: " << T << endl;
 //            cout <<"at height: " << robot0.getPosition().z << endl;
 //            cout <<"travel distance" << robot0.getDistance() << endl;
@@ -419,7 +424,7 @@ int main()
             model = glm::translate(model, vec3(0.5, -0.5, -0.5));
 
             // robot 0
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < robotGroup.size(); i++) {
                 robotGroup[i].updateRobot();
                 robotGroup[i].updateVertices();
                 robotGroup[i].breathing();
