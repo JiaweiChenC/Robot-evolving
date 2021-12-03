@@ -1,6 +1,7 @@
 #include "Cube.hpp"
 #include <time.h>
 #include <assert.h>
+#include <algorithm>
 const double MASS = 0.1;
 double LENGTH = 0.1;
 double gravity = 9.81;
@@ -9,7 +10,7 @@ double L0 = 0.1;
 double dt = 0.001;
 double mu = 0.8;
 int DIM = 3;
-double omega = 50;
+double omega = 70;
 double restoreConstant = 10000;
 double kGround = 5000;
 int springConstant = 5000;
@@ -38,6 +39,7 @@ std::uniform_real_distribution<> dist0(0, 1);
 std::uniform_int_distribution<> dist1(3000, 15000);
 std::uniform_real_distribution<> dist2(-0.01, 0.01);
 using namespace std;
+
 Robot::Robot(double x, double y, double z, int robotSize){
     int randomChoiceCube;
     int randomChoiceFace;
@@ -116,70 +118,12 @@ Robot::Robot(double x, double y, double z, int robotSize){
     startPos = getPosition();
 }
 
-void Robot::mutate() {
-    int mutate = 0;
-    while(mutate < 1){
-        // choose a cube randomly
-        int randomChoiceCube, randomChoiceFace;
-        randomChoiceCube = rand() % cubes.size();
-//        cout << "random choose cube: " << randomChoiceCube << endl;
-        Cube cube = cubes[randomChoiceCube];
-        // choose a face randomly
-        randomChoiceFace = rand() % 6;
-//        cout << "random choose face: " << randomChoiceFace << endl;
-        // generate a cube in front
-        switch (randomChoiceFace) {
-            case 0:
-                if (checkExist(cube.center[0] + 0.1, cube.center[1], cube.center[2])) break;
-                else {
-                    createCube(cube.center[0] + 0.1, cube.center[1], cube.center[2]);
-                    mutate += 1;
-                    break;
-                }
-
-            case 1:
-                if (checkExist(cube.center[0] - 0.1, cube.center[1], cube.center[2])) break;
-                else {
-                    createCube(cube.center[0] - 0.1, cube.center[1], cube.center[2]);
-                    mutate += 1;
-                    break;
-                }
-                    
-            case 2:
-                if (checkExist(cube.center[0], cube.center[1] + 0.1, cube.center[2])) break;
-                else {
-                    createCube(cube.center[0], cube.center[1] + 0.1, cube.center[2]);
-                    mutate += 1;
-                    break;
-                }
-    
-            case 3:
-                if (checkExist(cube.center[0], cube.center[1] - 0.1, cube.center[2])) break;
-                else {
-                    createCube(cube.center[0], cube.center[1] - 0.1, cube.center[2]);
-                    mutate += 1;
-                    break;
-                }
-                
-            case 4:
-                if (checkExist(cube.center[0], cube.center[1], cube.center[2] + 0.1)) break;
-                else {
-                    createCube(cube.center[0], cube.center[1], cube.center[2] + 0.1);
-                    mutate += 1;
-                    break;
-                }
-            case 5:
-                if (checkExist(cube.center[0], cube.center[1], cube.center[2] - 0.1) || cube.center[2] - 0.1<0) break;
-                else {
-                    createCube(cube.center[0], cube.center[1], cube.center[2] - 0.1);
-                    mutate += 1;
-                    break;
-                }
-            default:
-                break;
-        }
+Robot::Robot(vector<vector<double>> cubes) {
+    for (const vector<double>& cube: cubes) {
+        createCube(cube[0], cube[1], cube[2]);
     }
 }
+
 
 bool Robot::checkExist(double x, double y, double z) {
     bool exist = false;
@@ -197,7 +141,6 @@ void Robot::createCube (double x, double y, double z) {
     // this center is a center of xy face
     cube.center = {x, y, z};
     //cout << "x: " << x << " y: " << y << " z: " << z << endl;
-    cubes.push_back(cube);
     cube_num += 1;
     vector<double> position = {x ,y ,z};
     existCube.push_back(position);
@@ -221,9 +164,11 @@ void Robot::createCube (double x, double y, double z) {
     for (int j = 0; j < tempMasses.size(); j++) {
         for (int i = 0; i < masses.size(); i++) {
             if (theSame(tempMasses[j], masses[i])) {
+                masses[i].useTimes += 1;
                 tempMasses[j].m = 0;
                 coinciding.push_back(i);
                 imMasses.push_back(i);
+                cube.cubeMass.push_back(i);
             }
         }
     }
@@ -234,6 +179,7 @@ void Robot::createCube (double x, double y, double z) {
         if(tempMasses[i].m != 0) {
             masses.push_back(tempMasses[i]);
             imMasses.push_back(n+count);
+            cube.cubeMass.push_back(n + count);
             count++;
         }
     }
@@ -263,6 +209,7 @@ void Robot::createCube (double x, double y, double z) {
         spring.L0 = distance(masses[spring.m1].p, masses[spring.m2].p);
         spring.a= distance(masses[spring.m1].p, masses[spring.m2].p);
     }
+    cubes.push_back(cube);
     //cout << "coinciding: " << coinciding.size() << endl;
     //cout << "imMasses: ";
 //    for (const auto& i: imMasses) {
@@ -355,7 +302,7 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
 //        cout << "tempCube: ";
         for (int j = 0; j < 8; j++) {
             imMasses[8 * i + j] = tempCube[j];
-//            cout << tempCube[j] <<" " ;
+//            cout << tempCube[j] <<" " ;     
         };
         
         for (int k = 0; k < 12; k++) {
@@ -534,11 +481,93 @@ vector<Robot> generateRobotGroup(int robotNum) {
     return robotGroup;
 }
 
-void mutateRobot(Robot robot) {
-    return;
+Robot mutateRobot(Robot robot) {
+    int mutateType = 0;
+    cout << "mutate type: " << mutateType << endl;
+    // mutate to add a cube
+    if (mutateType == 0){
+        int mutate = 0;
+        while (mutate < 1) {
+            int choice = rand() % robot.existCube.size();  // don't delete the motor
+            if (canDelete(robot, robot.existCube[choice]) == true) {
+                Robot newRobot = deleteCube(robot, robot.existCube[choice][0], robot.existCube[choice][1], robot.existCube[choice][2]);
+                mutate++;
+                return newRobot;
+            }
+            else {
+                choice = rand() % robot.existCube.size();
+            }
+        }
+        return robot;
+    }
+    else{
+        int mutate = 0;
+        while(mutate < 1){
+                // choose a cube randomly
+                int randomChoiceCube, randomChoiceFace;
+                randomChoiceCube = rand() % robot.cubes.size();
+        //        cout << "random choose cube: " << randomChoiceCube << endl;
+                Cube cube = robot.cubes[randomChoiceCube];
+                // choose a face randomly
+                randomChoiceFace = rand() % 6;
+        //        cout << "random choose face: " << randomChoiceFace << endl;
+                // generate a cube in front
+                switch (randomChoiceFace) {
+                    case 0:
+                        if (robot.checkExist(cube.center[0] + 0.1, cube.center[1], cube.center[2])) break;
+                        else {
+                            robot.createCube(cube.center[0] + 0.1, cube.center[1], cube.center[2]);
+                            mutate++;
+                            break;
+                        }
+
+                    case 1:
+                        if (robot.checkExist(cube.center[0] - 0.1, cube.center[1], cube.center[2])) break;
+                        else {
+                            robot.createCube(cube.center[0] - 0.1, cube.center[1], cube.center[2]);
+                            mutate++;
+                            break;
+                        }
+
+                    case 2:
+                        if (robot.checkExist(cube.center[0], cube.center[1] + 0.1, cube.center[2])) break;
+                        else {
+                            robot.createCube(cube.center[0], cube.center[1] + 0.1, cube.center[2]);
+                            mutate++;
+                            break;
+                        }
+
+                    case 3:
+                        if (robot.checkExist(cube.center[0], cube.center[1] - 0.1, cube.center[2])) break;
+                        else {
+                            robot.createCube(cube.center[0], cube.center[1] - 0.1, cube.center[2]);
+                            mutate++;
+                            break;
+                        }
+
+                    case 4:
+                        if (robot.checkExist(cube.center[0], cube.center[1], cube.center[2] + 0.1)) break;
+                        else {
+                            robot.createCube(cube.center[0], cube.center[1], cube.center[2] + 0.1);
+                            mutate++;
+                            break;
+                        }
+                    case 5:
+                        if (robot.checkExist(cube.center[0], cube.center[1], cube.center[2] - 0.1) || cube.center[2] - 0.1<0) break;
+                        else {
+                            robot.createCube(cube.center[0], cube.center[1], cube.center[2] - 0.1);
+                            mutate++;
+                            break;
+                        }
+                    default:
+                        break;
+                }
+            }
+        return robot;
+    }
 }
 
-vector<Robot> crossoverRobot(Robot parent1, Robot parent2) {
+vector<Robot> crossoverRobotMotor(Robot parent1, Robot parent2) {
     vector<Robot> result;
     // crossover k
     if (dist0(rng) < crossPro) {
@@ -588,7 +617,7 @@ void selection(vector<Robot>& robotGroup) {
     for (int i = 0; i < winnerEffects; i++) {
         int randomIndex = rand()%robotGroup.size();
         vector<Robot> twoChild;
-        twoChild = crossoverRobot(robotGroup[0], robotGroup[randomIndex]);
+        twoChild = crossoverRobotMotor(robotGroup[0], robotGroup[randomIndex]);
         nextGeneration.push_back(twoChild[0]);
         nextGeneration.push_back(twoChild[1]);
     }
@@ -601,7 +630,7 @@ void selection(vector<Robot>& robotGroup) {
         int randomIndex2 = rand()%robotGroup.size();
         Robot parent1 = robotGroup[randomIndex1];
         Robot parent2 = robotGroup[randomIndex2];
-        twoChild = crossoverRobot(parent1, parent2);
+        twoChild = crossoverRobotMotor(parent1, parent2);
         nextGeneration.push_back(twoChild[0]);
         nextGeneration.push_back(twoChild[1]);
     }
@@ -631,6 +660,45 @@ double getDiversity(vector<Robot>& robotGroup) {
         }
     }
     return div;
+}
+
+bool canDelete(Robot robot, vector<double> cubePosition) {
+    int nearbyNum = 0;
+    if(robot.checkExist(cubePosition[0] + 0.1, cubePosition[1], cubePosition[2])) nearbyNum ++;
+    if(robot.checkExist(cubePosition[0] - 0.1, cubePosition[1], cubePosition[2])) nearbyNum ++;
+    if(robot.checkExist(cubePosition[0], cubePosition[1] + 0.1, cubePosition[2])) nearbyNum ++;
+    if(robot.checkExist(cubePosition[0], cubePosition[1] - 0.1, cubePosition[2])) nearbyNum ++;
+    if(robot.checkExist(cubePosition[0], cubePosition[1], cubePosition[2] + 0.1)) nearbyNum ++;
+    if(robot.checkExist(cubePosition[0], cubePosition[1], cubePosition[2] - 0.1)) nearbyNum ++;
+    if (nearbyNum > 3 || nearbyNum == 1) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+bool approximatelyEqual(float a, float b)
+{
+    return fabs(a - b) <= ( (fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * 0.01);
+}
+
+Robot deleteCube(Robot robot, double x, double y, double z) {
+    int index = 0;
+    for (const vector<double>& cube: robot.existCube) {
+        if (approximatelyEqual(cube[0], x) && approximatelyEqual(cube[1], y) && approximatelyEqual(cube[2], z)) {
+            cout << "delete" << endl;
+            break;
+        }
+        else {
+            index ++;
+        }
+    }
+    robot.existCube.erase(robot.existCube.begin() + index);
+    cout << robot.existCube.size() << endl;
+    Robot newRobot(robot.existCube);
+    return newRobot;
 }
 
 vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotReturn, double cycleTime, bool record) {

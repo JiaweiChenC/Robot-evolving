@@ -49,6 +49,11 @@ struct Mass
     glm::dvec3 v;        // velocity x, y, z
     glm::dvec3 a;        // acceleration
     glm::dvec3 force;
+    int useTimes = 1;
+//    bool operator==(const struct Mass& a) const
+//    {
+//        return ( a.p == this->p && a.p == this->p );
+//    }
 };
 
 struct Spring
@@ -60,10 +65,15 @@ struct Spring
     double a;
     double b = 0.02;
     double c = 0.01;
+    bool operator==(const struct Spring& a) const
+    {
+        return (a.m1 == this->m1 && a.m2 == this->m2);
+    }
 };
 
 struct Cube {
     vector<double> center = {0, 0, 0};
+    vector<int> cubeMass;
 };
 
 struct Gene {
@@ -76,7 +86,7 @@ class Robot {
 public:
     // constructor
     Robot(double x, double y, double z, int robotSize);
-    Robot(int robotSize, int robotNum);
+    Robot(vector<vector<double>> cubes);
     void updateRobot();
     void updateVertices();
     void createCube (double x, double y, double z);
@@ -88,7 +98,6 @@ public:
     double getDistance();
     void setDistance();
     void updateCubeFace();
-    void mutate();
     bool checkExist(double x, double y, double z);
     double moveDistance;
     vector<vector<double>> existCube;// use to record where exists a cube, help mutate
@@ -106,11 +115,17 @@ private:
 
 vector<Robot> generateRobotGroup(int robotNum);
 vector<Robot> generateRobotGroup2(int robotNum);
-void mutateRobot(Robot robot);
+Robot mutateRobot(Robot robot);
 void selection(vector<Robot>& robotGroup);
+vector<Robot> crossoverRobotMotor(Robot parent1, Robot parent2);
 vector<Robot> crossoverRobot(Robot parent1, Robot parent2);
 double getDiversity(vector<Robot>& robotGroup);
 double getGroupDistance(vector<Robot> robot);
 vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotReturn, double cycleTime, bool record);
 void runningSimulate(Robot& robot, double runningTime);
+bool approximatelyEqual(float a, float b);
+bool springRemove(const Spring& spirng);
+bool canDelete(Robot robot, vector<double> cubePosition);
+Robot deleteCube(Robot robot, double x, double y, double z);
 #endif /* Cube_hpp */
+

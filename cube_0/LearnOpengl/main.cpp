@@ -50,6 +50,7 @@ extern vector<GLuint> myEdge_indices; // cube_count * 12 * 2
 vector<vector<GLuint>> cubeIndicesGroup;
 vector<vector<GLuint>> edgeIndicesGroup;
 vector<vector<GLdouble>> cubeVerticesGroup;
+vector<vector<GLdouble>>  cubeColorGroup;
 float skyboxVertices[] = {
     // positions
     -1.0f,  1.0f, -1.0f,
@@ -153,15 +154,20 @@ int main()
 {
 //    srand(time(0));
     Robot robot0(0.0, 0.0, 0.0001, 2);
-    Robot robot1(-1, 0.0, 0.0001, 2);
-    Robot robot2(-2, 0.0, 0.0001, 2);
-    Robot robot3(-3, 0.0, 0.0001, 2);
-    Robot robot4(1.0, 0.0, 0.0001, 2);
-    Robot robot5(2.0, 0.0, 0.0001, 2);
-    Robot robot6(3.0, 0.0, 0.0001, 2);
-    Robot robot7(4.0, 0.0, 0.0001, 2);
-    Robot robot8(-4.0, 0.0, 0.0001, 2);
+    Robot robot1(-1, 0.0, 0.0001, 20);
+    Robot robot2(-2, 0.0, 0.0001, 20);
+    Robot robot3(-3, 0.0, 0.0001, 20);
+    Robot robot4(1.0, 0.0, 0.0001, 20);
+    Robot robot5(2.0, 0.0, 0.0001, 20);
+    Robot robot6(3.0, 0.0, 0.0001, 20);
+    Robot robot7(4.0, 0.0, 0.0001, 20);
+    Robot robot8(-4.0, 0.0, 0.0001, 20);
+    cout << robot0.cubes[0].cubeMass.size() << endl;
 
+    Robot newRobot = robot1;
+    for (int i = 0; i < 12 ; i++)
+    {robot1 = mutateRobot(robot1);}
+    cout << "size: " << robot1.cubes.size() << endl;
     vector<Robot> robotGroup;
     robotGroup.push_back(robot0);
     robotGroup.push_back(robot1);
@@ -206,6 +212,8 @@ int main()
         cubeIndicesGroup.push_back(cubeIndices);
         edgeIndicesGroup.push_back(myEdge_indices);
         cubeVerticesGroup.push_back(cubeVertices);
+        cubeColorGroup.push_back(cubeColor);
+        cubeColor.clear();
         cubeIndices.clear();
         myEdge_indices.clear();
     }
@@ -319,7 +327,7 @@ int main()
             GLuint colorbufferCube;
             glGenBuffers(1, &colorbufferCube);
             glBindBuffer(GL_ARRAY_BUFFER, colorbufferCube);
-            glBufferData(GL_ARRAY_BUFFER, cubeColor.size() * 8, cubeColor.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, cubeColorGroup[i].size() * 8, cubeColorGroup[i].data(), GL_STATIC_DRAW);
             glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 0, (void*)0); // set to 0, opengl decide
             glEnableVertexAttribArray(1);
         }

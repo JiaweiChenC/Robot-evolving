@@ -796,6 +796,7 @@
 		4E6E0D98273EDC0C00A66F14 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include,
@@ -814,6 +815,7 @@
 		4E6E0D99273EDC0C00A66F14 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include,
