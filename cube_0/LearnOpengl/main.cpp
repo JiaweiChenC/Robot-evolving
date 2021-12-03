@@ -153,20 +153,27 @@ vector<vector<GLuint>> edgeIndices{
 int main()
 {
 //    srand(time(0));
-    Robot robot0(0.0, 0.0, 0.0001, 2);
-    Robot robot1(-1, 0.0, 0.0001, 20);
-    Robot robot2(-2, 0.0, 0.0001, 20);
-    Robot robot3(-3, 0.0, 0.0001, 20);
-    Robot robot4(1.0, 0.0, 0.0001, 20);
-    Robot robot5(2.0, 0.0, 0.0001, 20);
-    Robot robot6(3.0, 0.0, 0.0001, 20);
-    Robot robot7(4.0, 0.0, 0.0001, 20);
-    Robot robot8(-4.0, 0.0, 0.0001, 20);
-    cout << robot0.cubes[0].cubeMass.size() << endl;
-
-    Robot newRobot = robot1;
-    for (int i = 0; i < 12 ; i++)
-    {robot1 = mutateRobot(robot1);}
+    Robot robot0(0.0, 0.0, 0.0,40);
+    Robot robot1(0, 0.0, 0.0, 40);
+    Robot robot2(0, 0.0, 0.0, 20);
+    Robot robot3(0, 0.0, 0.0, 20);
+    Robot robot4(0, 0.0, 0.0, 20);
+    Robot robot5(0, 0.0, 0.0, 20);
+    Robot robot6(0, 0.0, 0.0, 20);
+    Robot robot7(0, 0.0, 0.0, 20);
+    Robot robot8(0, 0.0, 0.0, 20);
+//    vector<double> p1 = {0, 0, 0};
+//    vector<double> p2 = {0, 0.1, 0};
+//    vector<double> p3 = {-0.1, 0, 0};
+//    vector<double> p4 = {-0.1, 0.1, 0};
+//    vector<vector<double>> pos;
+//    pos.push_back(p1);
+//    pos.push_back(p2);
+//    pos.push_back(p3);
+//    pos.push_back(p4);
+//    robot0  = deleteCubes(robot0, pos);
+//    for (int i = 0; i < 12 ; i++)
+//    {robot1 = mutateRobot(robot1);}
     cout << "size: " << robot1.cubes.size() << endl;
     vector<Robot> robotGroup;
     robotGroup.push_back(robot0);
@@ -412,7 +419,7 @@ int main()
             model = glm::translate(model, vec3(0.5, -0.5, -0.5));
 
             // robot 0
-            for (int i = 0; i< robotGroup.size(); i++) {
+            for (int i = 0; i < 2; i++) {
                 robotGroup[i].updateRobot();
                 robotGroup[i].updateVertices();
                 robotGroup[i].breathing();

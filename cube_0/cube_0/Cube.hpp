@@ -71,6 +71,7 @@ struct Spring
     }
 };
 
+
 struct Cube {
     vector<double> center = {0, 0, 0};
     vector<int> cubeMass;
@@ -87,6 +88,7 @@ public:
     // constructor
     Robot(double x, double y, double z, int robotSize);
     Robot(vector<vector<double>> cubes);
+    Robot() = default;
     void updateRobot();
     void updateVertices();
     void createCube (double x, double y, double z);
@@ -113,8 +115,6 @@ private:
     glm::dvec3 currentPos;
 };
 
-vector<Robot> generateRobotGroup(int robotNum);
-vector<Robot> generateRobotGroup2(int robotNum);
 Robot mutateRobot(Robot robot);
 void selection(vector<Robot>& robotGroup);
 vector<Robot> crossoverRobotMotor(Robot parent1, Robot parent2);
@@ -123,9 +123,10 @@ double getDiversity(vector<Robot>& robotGroup);
 double getGroupDistance(vector<Robot> robot);
 vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotReturn, double cycleTime, bool record);
 void runningSimulate(Robot& robot, double runningTime);
-bool approximatelyEqual(float a, float b);
+bool approximatelyEqual(double a, double b);
 bool springRemove(const Spring& spirng);
 bool canDelete(Robot robot, vector<double> cubePosition);
 Robot deleteCube(Robot robot, double x, double y, double z);
+Robot deleteCubes(Robot robot, vector<vector<double>> positions);
 #endif /* Cube_hpp */
 
