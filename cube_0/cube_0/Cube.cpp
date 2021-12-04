@@ -728,14 +728,11 @@ int getDiversity(vector<Robot>& robotGroup) {
     int n = (int)robotGroup.size();
     for (int i = 0; i < n; i++) {
         for (int j = i + 1; j < n; j++) {
-            bool exist = false;
+            // for every cube in i check if it exists in j
             for (const vector<double>& position:robotGroup[i].existCube) {
-                if (robotGroup[j].checkExist(position[0], position[1], position[2])) {
-                    exist = true;
+                if (!robotGroup[j].checkExist(position[0], position[1], position[2])) {
+                    div++;
                 }
-            }
-            if (exist == false) {
-                div += 1;
             }
         }
     }
