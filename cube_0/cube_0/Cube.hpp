@@ -63,7 +63,7 @@ struct Spring
     int m1;         // connected mass 1
     int m2;         // connected mass 2
     double a;
-    double b = 0.02;
+    double b = 0.01;
     double c = 0.01;
     bool operator==(const struct Spring& a) const
     {
