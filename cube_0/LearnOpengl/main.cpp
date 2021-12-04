@@ -152,9 +152,9 @@ vector<vector<GLuint>> edgeIndices{
 
 int main()
 {
-    srand(time(0));
-    vector<Robot> robots = geneticAlgorithm(20, 10, 10, 2, true);
-    Robot robot0(0.0, 0.0, 0.0,20);
+    srand(time(NULL));
+    vector<Robot> robots = geneticAlgorithm(20, 100, 10, 2, true);
+    Robot robot0(0, 0.0, 0.0,20);
     Robot robot1(0, 0.0, 0.0, 20);
     Robot robot2(0, 0.0, 0.0, 20);
     Robot robot3(0, 0.0, 0.0, 20);
