@@ -103,18 +103,6 @@ Robot::Robot(double x, double y, double z, int robotSize){
                 break;
         }
     }
-
-//    if (evolution) {
-//        for (int count = 0; count < 28; count++) {
-//            gene.k.push_back(dist1(rng));
-//        }
-//        // have motorCube to generate power for cube
-//        for (int count = 0; count < 28; count++) {
-//            gene.c.push_back(dist0(rng) * 2 * M_PI);
-//            gene.b.push_back(dist2(rng));
-//        }
-//
-//    }
     startPos = getPosition();
 }
 
@@ -483,7 +471,7 @@ glm::dvec2 Robot::getPosition() {
 vector<Robot> generateRobotGroup(int robotNum) {
     vector<Robot> robotGroup;
     for (int i = 0; i < robotNum; i++) {
-        Robot robot(0, 0, 0.01, 20);
+        Robot robot(0, 0, 0.0, 20);
         robotGroup.push_back(robot);
     }
     return robotGroup;
@@ -495,7 +483,7 @@ vector<Robot> crossoverRobot(Robot parent1, Robot parent2) {
     Robot child2;
     double height1 = 0.0;
     double height2 = 0.0;
-    // get the height of each robot
+    // get the height of parents
     for (const vector<double>& exist: parent1.existCube) {
         if (exist[2] > height1) height1 = exist[2];
     }
@@ -510,26 +498,24 @@ vector<Robot> crossoverRobot(Robot parent1, Robot parent2) {
     // record the cube need to exchange
     vector<vector<double>> change1;
     vector<vector<double>> change2;
-    // change a layer
+    // all the cubes in the choosen height
     for (const vector<double>& exist: parent1.existCube) {
         if (approximatelyEqual(exist[2], height)) change1.push_back(exist);
-    }
-    for (int i = 0; i < change1.size(); i++) {
-        child1 = deleteCubes(parent1, change1);
-        for (const vector<double>& change: change2) {
-//            if (!child1.checkExist(change[0], change[1], change[2]))
-            child1.createCube(change[0], change[1], change[2]);
-        }
     }
     for (const vector<double>& exist: parent2.existCube) {
         if (approximatelyEqual(exist[2], height)) change2.push_back(exist);
     }
-    for (int i = 0; i < change1.size(); i++) {
-        child2 = deleteCubes(parent2, change2);
-        for (const vector<double>& change: change1) {
+    
+    child1 = deleteCubes(parent1, change1);
+    for (const vector<double>& change: change2) {
+//            if (!child1.checkExist(change[0], change[1], change[2]))
+        child1.createCube(change[0], change[1], change[2]);
+    }
+    
+    child2 = deleteCubes(parent2, change2);
+    for (const vector<double>& change: change1) {
 //            if (!child2.checkExist(change[0], change[1], change[2]))
-            child2.createCube(change[0], change[1], change[2]);
-        }
+        child2.createCube(change[0], change[1], change[2]);
     }
     twoChild.push_back(child1);
     twoChild.push_back(child2);
@@ -640,32 +626,7 @@ Robot mutateRobot(Robot robot) {
 }
 
 
-//vector<Robot> crossoverRobotMotor(Robot parent1, Robot parent2) {
-//    vector<Robot> result;
-//    // crossover k
-//    if (dist0(rng) < crossPro) {
-//        std::vector<double> tempk = parent1.gene.k;
-//        parent1.gene.k = parent2.gene.k;
-//        parent2.gene.k = tempk;
-//    }
-//    // crossover b
-//    else if (dist0(rng) < crossPro + 0.4) {
-//        std::vector<double> tempb = parent1.gene.b;
-//        parent1.gene.b = parent2.gene.b;
-//        parent2.gene.b = tempb;
-//    }
-//    //crossover c
-//    else{
-//        std::vector<double> tempc = parent1.gene.c;
-//        parent1.gene.c = parent2.gene.c;
-//        parent2.gene.c = tempc;
-//    }
-//    result.push_back(parent1);
-//    result.push_back(parent2);
-//    return result;
-//}
-
-// just a buble ranking
+// just a buble sorting
 void selection(vector<Robot>& robotGroup) {
     int popSize = (int)robotGroup.size();
     // sorting the whole population
@@ -828,7 +789,7 @@ vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotRetur
         learningCurve << robotGroup[0].moveDistance << endl;
         cout << "best in this generation: " << robotGroup[0].moveDistance << endl;
         // crossover
-//        crossover(robotGroup);
+        crossover(robotGroup);
         // mutate
         for (int j = 0; j < robotGroup.size(); j++) {
             if (dist0(rng) < mutatePro) {
