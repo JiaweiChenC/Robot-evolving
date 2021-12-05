@@ -164,74 +164,15 @@ int main()
     Robot robot6(2, 0.0, 0.0, 20);
     Robot robot7(3, 0.0, 0.0, 20);
     Robot robot8(4, 0.0, 0.0, 20);
-
-    vector<double> p1 = {0, 0, 0.1};
-    vector<double> p2 = {0, 0, 0.2};
-    vector<double> p3 = {0, 0, 0.3};
-    vector<double> p4 = {0, -0.1, 0.2};
-    vector<double> p5 = {0, 0.1, 0.3};
-    vector<double> p6 = {0, -0.1, 0.3};
-    vector<double> p7 = {0, -0.2, 0.3};
-    vector<double> p8 = {0, -0.2, 0.2};
-    vector<double> p9 = {-0.1, 0.1, 0.3};
-    vector<double> p10 = {-0.1, 0.2, 0.3};
-    vector<double> p11 = {-0.1, -0.1, 0.2};
-    vector<double> p12 = {-0.1, 0.2, 0.4};
-    vector<double> p13 = {-0.1, 0, 0.3};
-    vector<double> p14 = {0, 0, 0.4};
-    vector<double> p15 = {-0.1, -0.2, 0.2};
-    vector<double> p16 = {0.1, 0, 0.4};
-    vector<double> p17 = {0, 0, 0};
-    vector<double> p18 = {0.1, 0, 0};
-    vector<double> p19 = {0.1, 0.1, 0};
-    vector<double> p20 = {0, 0.1, 0};
-    vector<double> p21 = {-0.1, 0.1, 0};
-    vector<double> p22 = {0, 0.2, 0};
-    vector<double> p23 = {0.2, 0, 0};
-    vector<double> p24 = {-0.2, 0.1, 0};
-    vector<double> p25 = {0.2, 0.1, 0};
-    vector<double> p26 = {-0.1, 0.2, 0};
-    vector<double> p27 = {-0.1, 0.1, 0.4};
-    vector<double> p28 = {-0.1, 0.1, 0.1};
-    vector<double> p29 = {-0.1, 0, 0.4};
-    vector<double> p30 = {-0.1, 0.1, 0.2};
-    vector<double> p31 = {-0.1, -0.2, 0.3};
     
-    vector<vector<double>> cubes;
-    cubes.push_back(p1);
-    cubes.push_back(p2);
-    cubes.push_back(p3);
-    cubes.push_back(p4);
-    cubes.push_back(p5);
-    cubes.push_back(p6);
-    cubes.push_back(p7);
-    cubes.push_back(p8);
-    cubes.push_back(p9);
-    cubes.push_back(p10);
-    cubes.push_back(p11);
-    cubes.push_back(p12);
-    cubes.push_back(p13);
-    cubes.push_back(p14);
-    cubes.push_back(p15);
-    cubes.push_back(p16);
-    cubes.push_back(p17);
-    cubes.push_back(p18);
-    cubes.push_back(p19);
-    cubes.push_back(p20);
-    cubes.push_back(p21);
-    cubes.push_back(p22);
-    cubes.push_back(p23);
-    cubes.push_back(p24);
-    cubes.push_back(p25);
-    cubes.push_back(p26);
-    cubes.push_back(p27);
-    cubes.push_back(p28);
-    cubes.push_back(p29);
-    cubes.push_back(p30);
-    cubes.push_back(p31);
-    for (vector<double>& cube: cubes) {
-        cube[2] += 0.2;
+    ifstream inData;
+    vector<vector<double>> cubes(28, vector<double> (3));
+    inData.open("/Users/jiaweichen/Desktop/data.txt");
+    for (int i=0; i<28; i++) {
+    inData >> cubes[i][0] >> cubes[i][1] >> cubes[i][2];
     }
+    inData.close();
+    cout << cubes.size() << endl;
     Robot robotz(cubes);
     robot0 = robotz;
 //    vector<vector<double>> pos;
@@ -494,7 +435,7 @@ int main()
             for (int i = 0; i < 1; i++) {
                 robotGroup[i].updateRobot();
                 robotGroup[i].updateVertices();
-//                robotGroup[i].breathing();
+                robotGroup[i].breathing();
                 
                 glDepthFunc(GL_ALWAYS);
                 cubeShader.use();

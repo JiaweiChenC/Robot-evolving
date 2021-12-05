@@ -58,12 +58,12 @@ struct Mass
 
 struct Spring
 {
-    double k = 15000;       // spring constant
+    double k = 5000;       // spring constant
     double L0;      // original length
     int m1;         // connected mass 1
     int m2;         // connected mass 2
     double a;
-    double b = 0.01;
+    double b = 0.02;
     double c = 0.01;
     bool operator==(const struct Spring& a) const
     {
