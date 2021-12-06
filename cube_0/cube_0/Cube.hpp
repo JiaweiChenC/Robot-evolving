@@ -58,7 +58,7 @@ struct Mass
 
 struct Spring
 {
-    double k = 5000;       // spring constant
+    double k = 15000;       // spring constant
     double L0;      // original length
     int m1;         // connected mass 1
     int m2;         // connected mass 2
@@ -128,5 +128,6 @@ bool springRemove(const Spring& spirng);
 bool canDelete(Robot robot, vector<double> cubePosition);
 Robot deleteCube(Robot robot, double x, double y, double z);
 Robot deleteCubes(Robot robot, vector<vector<double>> positions);
+void randomSearch(int robotCount, int generationNum, bool record);
 #endif /* Cube_hpp */
 

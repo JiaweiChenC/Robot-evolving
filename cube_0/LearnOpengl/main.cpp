@@ -36,7 +36,7 @@ double b = 0.1;
 double c = 0.1;
 
 
-bool animation = true;
+bool animation = false;
 
 extern vector<GLdouble> cubeColor;
 extern vector<GLdouble> pointColor;
@@ -154,7 +154,7 @@ int main()
 {
     srand(time(NULL));
 //    vector<Robot> robots = geneticAlgorithm(10, 1, 10, 2, true);
-    
+    randomSearch(400, 100, true);
     Robot robot0(0, 0.0, 0.0,20);
     Robot robot1(-1, 0.0, 0.0, 20);
     Robot robot2(-2, 0.0, 0.0, 20);
@@ -166,15 +166,16 @@ int main()
     Robot robot8(4, 0.0, 0.0, 20);
     
     ifstream inData;
-    vector<vector<double>> cubes(28, vector<double> (3));
+    vector<vector<double>> cubes(25, vector<double> (3));
     inData.open("/Users/jiaweichen/Desktop/data.txt");
-    for (int i=0; i<28; i++) {
+    for (int i=0; i<25; i++) {
     inData >> cubes[i][0] >> cubes[i][1] >> cubes[i][2];
     }
     inData.close();
     cout << cubes.size() << endl;
     Robot robotz(cubes);
     robot0 = robotz;
+    robot0.resetMass();
 //    vector<vector<double>> pos;
 //    pos.push_back(p1);
 //    pos.push_back(p2);
@@ -458,7 +459,7 @@ int main()
                 glBindVertexArray(0);
                 
                 glDepthFunc(GL_LESS);
-                glPointSize(7.0f);
+                glPointSize(5.0f);
                 pointShader.use();
                 pointShader.setMat4("MVP", projection * view * model);
                 glBindVertexArray(pointVAO);

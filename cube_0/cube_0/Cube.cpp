@@ -806,4 +806,59 @@ vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotRetur
     return returnRobot;
 }
 
+void randomSearch(int robotCount, int generationNum, bool record) {
+    ofstream randomSearchdata;
+    randomSearchdata.open("/Users/jiaweichen/Desktop/data.txt");
+    double bestFitness = 0;
+        for (int j = 0; j < generationNum; j++) {
+            double bestFitnessinGeneration = 0;
+            vector<Robot> robotGroup = generateRobotGroup(robotCount);
+            for (Robot& robot: robotGroup) {
+                runningSimulate(robot, 2);
+                if (robot.moveDistance > bestFitnessinGeneration) {
+                    bestFitnessinGeneration = robot.moveDistance;
+                }
+            }
+            cout << "generation: " << j << endl;
+            if (bestFitnessinGeneration > bestFitness) bestFitness = bestFitnessinGeneration;
+            randomSearchdata << bestFitness << endl;
+    }
+    randomSearchdata.close();
+}
+
+
+void hillClimber(int robotCount, int generationNum) {
+    ofstream hillClimber;
+    hillClimber.open("/Users/jiaweichen/Desktop/data.txt");
+    double bestFitness = 0;
+    Robot bestRobot;
+    vector<Robot> robotGroup = generateRobotGroup(robotCount);
+    for (Robot& robot: robotGroup) {
+        runningSimulate(robot, 2);
+        if (robot.moveDistance > bestFitness) {
+            bestRobot = robot;
+            bestFitness = robot.moveDistance;
+        }
+    }
+    for (int i = 0; i < generationNum; i++) {
+        double bestFitnessInGeneration = 0;
+        Robot bestRobotInGeneration;
+        vector<Robot> newRobotGroup;
+        for (int i = 0; i < robotCount; i++) {
+            Robot newRobot = mutateRobot(bestRobot);
+            newRobotGroup.push_back(newRobot);
+        }
+        for (Robot& robot: newRobotGroup) {
+            runningSimulate(robot, 2);
+            if (robot.moveDistance > bestFitnessInGeneration) {
+                bestFitnessInGeneration = robot.moveDistance;
+                bestRobotInGeneration = robot;
+            }
+        }
+        if (bestFitnessInGeneration > bestFitness ) {
+            bestFitness = bestFitnessInGeneration;
+        }
+        hillClimber << bestFitness << endl;
+    }
+}
 
