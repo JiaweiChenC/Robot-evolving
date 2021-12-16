@@ -8,4 +8,4 @@ evolution.o: evolution.cpp
 	$(CC) $(CFLAGS) -c evolution.cpp
 
 clean:
-	rm *.o evolution
+	rm *.o evolution *.txt

@@ -7,19 +7,14 @@
 #include "robot.hpp"
 #include "kernel.cuh"
 
-void simulateRobots(const std::vector<Robot>& robots, std::vector<double>& distances) {
-    assert(distances.empty());
+void simulateRobots(const std::vector<Robot>& robots, double* distances) {
     unsigned int N = robots.size();
-    // reserve slots for distances
-    distances.reserve(N);
     // convert CPU data structure to knl optimized data structures
     knl_Robot* knl_robots = new knl_Robot[N];
     for (int i = 0; i < N; ++ i) {
         const Robot& robot = robots[i];
         int num_masses = robot.masses.size();
         int num_springs = robot.springs.size();
-
-        // printf("Before: num mass: %d, num springs: %d\n", num_masses, num_springs);
 
         knl_Mass* knl_masses = new knl_Mass[num_masses];   
         knl_Spring* knl_springs = new knl_Spring[num_springs];
@@ -72,11 +67,7 @@ void simulateRobots(const std::vector<Robot>& robots, std::vector<double>& dista
     cudaDeviceSynchronize();
 
     // retrieve distances
-    double* knl_distances = new double[N];
-
-    cudaMemcpy(knl_distances, device_distances, N * sizeof(double), cudaMemcpyDeviceToHost);
-
-    delete[] knl_distances;
+    cudaMemcpy(distances, device_distances, N * sizeof(double), cudaMemcpyDeviceToHost);
 
     // free cuda memories
     for (int j = 0; j < N; ++ j) {
@@ -109,11 +100,13 @@ std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robot
         // Diversity << diversity << std::endl;
         // std::cout << "diversity: " << diversity << std::endl;
 
-        std::vector<double> distances;
+        int N = robotGroup.size();
+        double* distances = new double[N];
         simulateRobots(robotGroup, distances);
-        for (int j = 0; j < distances.size(); ++ j) {
+        for (int j = 0; j < N; ++ j) {
             robotGroup[j].moveDistance = distances[j];
         }
+        delete[] distances;
 
         dotchart << std::endl;
         // ranking and crossover
@@ -141,6 +134,6 @@ std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robot
 
 int main(void) {
     std::srand(time(NULL));
-    std::vector<Robot> robots = geneticAlgorithm(10000, 1, 10, 2, true);
+    std::vector<Robot> robots = geneticAlgorithm(1000, 1, 10, 2, true);
     // TODO
 }

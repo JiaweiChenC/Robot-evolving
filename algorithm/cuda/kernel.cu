@@ -130,6 +130,7 @@ inline __device__ void knl_updateRobot(knl_Robot& robot) {
 
 __global__ void glb_simulate(knl_Robot* robots, const unsigned int N, double* distances) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
+    // printf("i = %f\n", i);
     if (i >= N) return;
     
     double totalDuration = SIMULATE_DURATION;
@@ -148,7 +149,7 @@ __global__ void glb_simulate(knl_Robot* robots, const unsigned int N, double* di
     while (runningTime < totalDuration) {
         // Why 28?
         for (unsigned int j = 0; j < 28; ++ j) {
-            // printf("j=%d, num\n");
+            // printf("j=%d, num\n", j);
             robots[i].springs[j].L0 += robots[i].springs[j].a + 0.02 * sin(OMEGA * runningTime + 0.01 * M_PI);
         }
         // printf("One round of updated\n");

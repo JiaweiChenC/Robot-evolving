@@ -360,6 +360,6 @@ run: build
 	$(EXEC) ./evolution
 
 clean:
-	rm -f *.o evolution
+	rm -f *.o evolution *.txt
 
 clobber: clean

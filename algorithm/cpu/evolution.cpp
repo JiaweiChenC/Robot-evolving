@@ -854,7 +854,7 @@ void hillClimber(int robotCount, int generationNum) {
 int main() {  // ofstream parameters;
     // parameters.open("/home/jc5667/ea/parameters.txt");
     srand(time(NULL));
-    vector<Robot> robots = geneticAlgorithm(10000, 1, 10, 2, true);
+    vector<Robot> robots = geneticAlgorithm(400, 1, 10, 2, true);
     // for (int i = 0; i < robots.size(); i++) {
     // for (const vector<double>& cube: robots[i].existCube) {
     //     parameters << cube[0] << " " << cube[1] << " " << cube[2] << endl;
