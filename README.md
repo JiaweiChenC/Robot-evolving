@@ -27,7 +27,7 @@ To run the algorithm with serial implemention:
 2. $make evolution
 3. $./evolution
 
-To run the Opengl simulator
+To run the OpenGL simulator
 1. Install glm library
 2. Link OpenGL library: GLFW and GLAD
 
