@@ -7,6 +7,47 @@
 #include "robot.hpp"
 #include "kernel.cuh"
 
+
+void d_selection(std::vector<Robot>& robots, double* distances) {
+    unsigned int N = robots.size();
+
+    int winner_num = SELECT_PRESSURE * N;
+//    printf("winner_num %i\n", winner_num);
+    // setup for kernel
+    int* d_winners;
+    cudaMalloc((void**)&d_winners, winner_num * sizeof(int));
+    double* device_distances;
+    cudaMalloc((void**)&device_distances, N * sizeof(double));
+    cudaMemcpy(device_distances, distances, N * sizeof(double), cudaMemcpyHostToDevice);
+    // setup kernel
+    curandState* devStates;
+    cudaMalloc((void**)&devStates, N * sizeof(devStates));
+    // each group will have ten members
+    dim3 block(10, 1, 1);
+    dim3 grid((int)(N + 10 - 1)/10, 1, 1);
+    setup_kernel<<<grid, block>>>(devStates);
+    glb_selection<<<grid, block>>>(device_distances, d_winners, devStates);
+    cudaDeviceSynchronize();
+
+    int new_winners[60];
+    cudaMemcpy(new_winners, d_winners, winner_num * sizeof(int), cudaMemcpyDeviceToHost);
+ 
+    std::vector<Robot> nextGeneration;
+    for (int i = 0; i < winner_num; i++) {
+        nextGeneration.push_back(robots[new_winners[i]]);
+//        printf("host winners: %i\n", new_winners[i]);
+    }
+    while (nextGeneration.size() < N) {
+        Robot robot(0, 0, 0, 20);
+        nextGeneration.push_back(robot);
+    }
+    robots = nextGeneration;
+}
+
+
+
+
+// Genetic algorithm operators, including mutation and crossover!
 void evolve(std::vector<Robot>& robots) {
     unsigned int N = robots.size();
     knl_Robot* knl_robots = new knl_Robot[N];
@@ -22,20 +63,21 @@ void evolve(std::vector<Robot>& robots) {
             //printf("x: %f, y: %f, z: %f\n", knl_robot.existCubes[j].x,  knl_robot.existCubes[j].y, knl_robot.existCubes[j].z);
         }
     }
-    printf("knlrobots %i\n", knl_robots[0].num_cubes);
+//    printf("Best robot has:  %i cubes\n", knl_robots[0].num_cubes);
     knl_Robot* d_knl_robots;
     cudaMalloc((void**)&d_knl_robots,N * sizeof(knl_Robot)); 
     cudaMemcpy(d_knl_robots, knl_robots, N * sizeof(knl_Robot), cudaMemcpyHostToDevice);
 
-    //set up random 
+    // set up random 
     curandState *devStates;
     cudaMalloc((void**)&devStates, N * sizeof(devStates));
     dim3 grid((N + 512 - 1) / 512, 1, 1);
     dim3 block(512, 1, 1);
     setup_kernel<<<grid, block>>>(devStates);
 
-    //mutate kernel
+    // mutate kernel
     glb_mutate<<<grid, block>>>(d_knl_robots, N, devStates);
+    // crossover kernel
     glb_crossover<<<grid, block>>>(d_knl_robots, N, devStates);
     cudaDeviceSynchronize();
     knl_Robot* new_knl_robots = new knl_Robot[N];
@@ -49,6 +91,8 @@ void evolve(std::vector<Robot>& robots) {
     delete[] knl_robots;
 }
 
+
+// Simulating the robots to get their performance/speed
 void simulateRobots(const std::vector<Robot>& robots, double* distances) {
     unsigned int N = robots.size();
     // convert CPU data structure to knl optimized data structures
@@ -138,21 +182,24 @@ std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robot
         int N = robotGroup.size();
         double* distances = new double[N];
         simulateRobots(robotGroup, distances);
+        double greatest_distance = 0;
         for (int j = 0; j < N; ++ j) {
             robotGroup[j].moveDistance = distances[j];
             printf("distance: %f\n", distances[j]);
+            if (robotGroup[j].moveDistance > greatest_distance) {
+                greatest_distance = distances[j];
+            }
         }
+        std::cout << "Greatest distance is: " << greatest_distance << std::endl;
+        d_selection(robotGroup, distances);
         delete[] distances;
         dotchart << std::endl;
         // ranking and crossover
-        selection(robotGroup);
         learningCurve << robotGroup[0].moveDistance << std::endl;
-        std::cout << "best in this generation: " << robotGroup[0].moveDistance << std::endl;
-        // crossover
-//        crossover(robotGroup);
-        // mutate
+//        std::cout << "best in this generation: " << robotGroup[0].moveDistance << std::endl;
+        // mutate and crossover
         evolve(robotGroup);
-        std::cout << "finished generation: " << i << std::endl;
+//        std::cout << "finished generation: " << i << std::endl;
 
     }
     for (int i = 0; i < robotReturn; i++) {
@@ -168,8 +215,7 @@ int main(void) {
     // TODO
 
 
-
-    // test for mutation
+// test for mutation
 //    int N = 100;
 //    curandState *devStates;
 //    cudaMalloc((void**)&devStates, N * sizeof(devStates));

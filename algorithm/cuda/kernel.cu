@@ -2,11 +2,11 @@
 #include "stdio.h"
 #include "config.hpp"
 #include "math_constants.h"
+#include <assert.h>
 #include "device_launch_parameters.h"
 
 
 
-//check if two masses are coinciding
 
 // check if two number is equal
 inline __device__ bool approximatelyEqual(double a, double b) {
@@ -388,6 +388,39 @@ __global__ void glb_simulate(knl_Robot* robots, const unsigned int N, double* di
          curand_init(seed, id, 0, &states[id]); // Initialize CURAND
  }
 
+__global__ void glb_selection(double* distances, int* winners, curandState* d_state) {
+    int tid = threadIdx.x;
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    __shared__ double dist[10];
+    __shared__ double local_distance[10];
+    // load data to shared memory
+    if (tid < 10) dist[tid] = distances[idx];
+    __syncthreads();
+    for (int i = 0; i <= tid; i++) {
+        local_distance[tid] += dist[i];
+    }
+    __syncthreads();
+//    if (idx == 0)
+//    printf ("local distance: 1: %f, 2: %f, 3: %f, 4: %f\n", local_distance[0], local_distance[1], local_distance[2], local_distance[3]);
+    // tournament selection, select 6 winners in each group
+    if (tid < 6) {
+        double randomChoice = local_distance[9] * generate(d_state, idx);
+            if (randomChoice < local_distance[0]) {
+            winners[blockIdx.x * 6 + tid] = blockIdx.x * blockDim.x;
+//            printf("position: %i, winners %i\n", blockIdx.x * 6 + tid,  blockIdx.x * blockDim.x);
+            }
+        else {
+            for (int i = 0; i < 9; i++) {
+                if (randomChoice > local_distance[i] && randomChoice < local_distance[i + 1])
+                    {
+                        winners[blockIdx.x * 6 + tid] = blockIdx.x * blockDim.x + i + 1;
+//                        printf("position: %i, winners %i\n ",blockIdx.x * 6 + tid, blockIdx.x * blockDim.x + i + 1);
+                    }
+            }
+        }
+    }
+}
+
 //device mutate function
 __global__ void glb_mutate (knl_Robot* robots, const unsigned N, curandState *d_state) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -539,22 +572,22 @@ __global__ void glb_crossover(knl_Robot* robots, const unsigned N, curandState *
 //    printf("choice %i\n", randomChoice);
     height = 0.1 * (double) (randomChoice);
 
-    dvec3 change1[100];
-    dvec3 change2[100];
+//    dvec3 change1[100];
+//    dvec3 change2[100];
 
     dvec3 res[60];
     int count1 = 0;
     int count2 = 0;
     for (int i = 0; i < parent1.num_cubes; i++) {
         if (approximatelyEqual(parent1.existCubes[i].z, height)) {
-            change1[count1] = parent1.existCubes[i];
+//            change1[count1] = parent1.existCubes[i];
             res[i] = parent1.existCubes[i];
             ++ count1;
         }
     }
     for (int i = 0; i < parent2.num_cubes; i++) {
         if  (!approximatelyEqual(parent2.existCubes[i].z, height)) {
-            change2[count2] = parent2.existCubes[i];
+//            change2[count2] = parent2.existCubes[i];
             res[count2 +count1] = parent2.existCubes[i];
             ++ count2;
         }
