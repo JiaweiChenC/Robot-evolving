@@ -29,7 +29,7 @@ void d_selection(std::vector<Robot>& robots, double* distances) {
     glb_selection<<<grid, block>>>(device_distances, d_winners, devStates);
     cudaDeviceSynchronize();
 
-    int new_winners[60];
+    int* new_winners = new int[winner_num];
     cudaMemcpy(new_winners, d_winners, winner_num * sizeof(int), cudaMemcpyDeviceToHost);
  
     std::vector<Robot> nextGeneration;
