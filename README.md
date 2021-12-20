@@ -23,6 +23,11 @@ To run the algorithm with parallel implemention:
 3. $./evolution
 
 To run the algorithm with serial implemention:
-1. enter algorith/cpu
+1. enter algorithm/cpu
 2. $make evolution
 3. $./evolution
+
+To run the Opengl simulator
+1. Install glm library
+2. Link OpenGL library: GLFW and GLAD
+
