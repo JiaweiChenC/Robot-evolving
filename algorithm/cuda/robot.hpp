@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <random>
-
+#include "kernel.cuh"
 #include "config.hpp"
 
 static unsigned seed = 131;
@@ -48,6 +48,7 @@ class Robot {
     // constructor
     Robot(double x, double y, double z, int robotSize);
     Robot(std::vector<std::vector<double>> cubes);
+    Robot(dvec3* cubes, int n);
     Robot() = default;
     void updateVertices();
     void createCube(double x, double y, double z);

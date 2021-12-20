@@ -1,6 +1,6 @@
 #include "robot.hpp"
 #include <random>
-
+#include <iostream>
 Robot::Robot(double x, double y, double z, int robotSize) {
     int randomChoiceCube;
     int randomChoiceFace;
@@ -10,12 +10,12 @@ Robot::Robot(double x, double y, double z, int robotSize) {
     while (cube_num < robotSize) {
         // choose a cube randomly
         randomChoiceCube = rand() % cubes.size();
-        //        cout << "random choose cube: " << randomChoiceCube << endl;
+	//std::cout << "random choose cube: " << randomChoiceCube << std::endl;
         Cube cube = cubes[randomChoiceCube];
         // choose a face randomly
         randomChoiceFace = rand() % 6;
         //        cout << "random choose face: " << randomChoiceFace << endl;
-        // generate a cube in front
+        // generate a cube in font
         switch (randomChoiceFace) {
             case 0:
                 // create a front cube
@@ -70,16 +70,6 @@ Robot::Robot(double x, double y, double z, int robotSize) {
         }
     }
 
-    if (EVOLUTION) {
-        for (int count = 0; count < 28; count++) {
-            gene.k.push_back(dist1(rng));
-        }
-        // have motorCube to generate power for cube
-        for (int count = 0; count < 28; count++) {
-            gene.c.push_back(dist0(rng) * 2 * M_PI);
-            gene.b.push_back(dist2(rng));
-        }
-    }
 }
 
 Robot::Robot(std::vector<std::vector<double>> cubes) {
@@ -88,13 +78,23 @@ Robot::Robot(std::vector<std::vector<double>> cubes) {
     }
 }
 
+Robot::Robot(dvec3* cubes, int n) {
+    for (int i = 0; i < n; i ++){
+        createCube(cubes[i].x, cubes[i].y, cubes[i].z);
+    }
+}
+
 bool Robot::checkExist(double x, double y, double z) {
     bool exist = false;
+    
     for (const auto& position : existCube) {
-        if ((abs(position[0] - x) < 0.001 && abs(position[1] - y) < 0.001 && abs(position[2] - z) < 0.001)) {
+        if ((fabs(position[0] - x) < 0.001 && fabs(position[1] - y) < 0.001 && fabs(position[2] - z) < 0.001)) {
             exist = true;
+	    //std::cout << position[0] <<' ' << position[1] << ' ' << position[2] << std::endl;
         }
     }
+    //if (exist == true) std::cout << "true" << std::endl;
+    //else std::cout << "false" << std::endl;
     return exist;
 }
 
