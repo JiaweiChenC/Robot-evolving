@@ -171,10 +171,9 @@ std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robot
     std::vector<Robot> returnRobot;
     std::ofstream dotchart;
     std::ofstream learningCurve;
-    std::ofstream parameters;
-    learningCurve.open("./learning_curve.txt");
-    dotchart.open("./dot_chart.txt");
-
+    learningCurve.open("/home/jc5667/example2/cube-stuff/algorithm/cuda/learning_curve.txt");
+    dotchart.open("/home/jc5667/example2/cube-stuff/algorithm/cuda/dot_chart.txt");
+    
     // create a list of robot
     for (int i = 0; i < generationNum; i++) {
         std::cout << "-----------------generation:" << i << "----------------" << std::endl;
@@ -185,17 +184,18 @@ std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robot
         double greatest_distance = 0;
         for (int j = 0; j < N; ++ j) {
             robotGroup[j].moveDistance = distances[j];
+            dotchart << distances[j] << " ";
             printf("distance: %f\n", distances[j]);
             if (robotGroup[j].moveDistance > greatest_distance) {
                 greatest_distance = distances[j];
             }
         }
+        dotchart << std::endl;
         std::cout << "Greatest distance is: " << greatest_distance << std::endl;
         d_selection(robotGroup, distances);
         delete[] distances;
-        dotchart << std::endl;
         // ranking and crossover
-        learningCurve << robotGroup[0].moveDistance << std::endl;
+        learningCurve << greatest_distance<< std::endl;
 //        std::cout << "best in this generation: " << robotGroup[0].moveDistance << std::endl;
         // mutate and crossover
         evolve(robotGroup);
@@ -210,8 +210,16 @@ std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robot
     return returnRobot;
 }
 int main(void) {
+    std::ofstream parameters;
+    parameters.open("/home/jc5667/example2/cube-stuff/algorithm/cuda/parameters.txt");
     std::srand(time(NULL));
-    std::vector<Robot> robots = geneticAlgorithm(100, 3, 10, 5, true);
+    std::vector<Robot> robots = geneticAlgorithm(2000, 3, 10, 5, true);
+    for (const auto& robot: robots) {
+        for (const auto& cube: robot.existCube) {
+            parameters << cube[0] << " " << cube[1] << " " << cube[2] << std::endl;
+        }
+        parameters << "robot: " << std::endl;
+    }
     // TODO
 
 

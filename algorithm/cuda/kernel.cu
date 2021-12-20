@@ -581,7 +581,7 @@ __global__ void glb_crossover(knl_Robot* robots, const unsigned N, curandState *
     for (int i = 0; i < parent1.num_cubes; i++) {
         if (approximatelyEqual(parent1.existCubes[i].z, height)) {
 //            change1[count1] = parent1.existCubes[i];
-            res[i] = parent1.existCubes[i];
+            res[count1] = parent1.existCubes[i];
             ++ count1;
         }
     }
@@ -597,8 +597,8 @@ __global__ void glb_crossover(knl_Robot* robots, const unsigned N, curandState *
     robots[idx].existCubes[i] = res[i];
 
     }
-
     robots[idx].num_cubes = count1 + count2;
+    __syncthreads();
 //    deleteCubes(robots[idx], change1, count1);
 //    for (int i = 0; i < count2; i++) 
 //    {

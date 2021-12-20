@@ -17,7 +17,7 @@ static const int SPRING_CONSTANT = 5000;
 
 static const unsigned int DIM = 3;
 
-static const double SIMULATE_DURATION = 4;  // 5000 ms, 5 seconds
+static const double SIMULATE_DURATION = 0.1;  // 5000 ms, 5 seconds
 static const double SIMULATE_DELTA = 0.001;  // 1ms per step
 
 static const bool EVOLUTION = true;
