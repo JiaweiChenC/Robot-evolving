@@ -24,8 +24,8 @@ To run the algorithm with parallel implemention:
 
 To run the algorithm with serial implemention:
 1. enter algorithm/cpu
-2. $ make evolution
-3. $ ./evolution
+2. $make evolution$
+3. $./evolution$
 
 To run the OpenGL simulator
 1. Install glm library
