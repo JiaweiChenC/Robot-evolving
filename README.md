@@ -16,7 +16,7 @@ we use one thread to do the genetic operations for one robot. In selection, we u
 and select the winners inside each group, the winners are selected based on their fitness(the move distance), we also make use of shared memory in the selection 
 process.
 
-# To run this code
+# How to run this code
 To run the algorithm with parallel implemention:
 1. enter algorithm/cuda
 2. $make evolution
@@ -24,8 +24,8 @@ To run the algorithm with parallel implemention:
 
 To run the algorithm with serial implemention:
 1. enter algorithm/cpu
-2. $make evolution
-3. $./evolution
+2. $ make evolution
+3. $ ./evolution
 
 To run the OpenGL simulator
 1. Install glm library
