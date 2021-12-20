@@ -42,6 +42,7 @@ struct knl_Robot {
 
 };
 
+__global__ void glb_selection(double*, int*, curandState*);
 __global__ void glb_crossover(knl_Robot*, const unsigned int, curandState*);
 __global__ void glb_simulate(knl_Robot*, const unsigned int, double*);
 __global__ void glb_mutate(knl_Robot*, const unsigned int, curandState*);
