@@ -27,6 +27,9 @@ To run the algorithm with serial implementation:
 2. $make evolution
 3. $./evolution
 
+To run the OpenGL file
+1. Link needed library, e.g., GLFW, GLAD, GLM;
+
 # Possible Error Scenario
 All the codes are created and tested based on the CUDA 2021, makefile may not work with a different CUDA version.
 
