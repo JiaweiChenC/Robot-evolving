@@ -575,7 +575,7 @@ __global__ void glb_crossover(knl_Robot* robots, const unsigned N, curandState *
 //    dvec3 change1[100];
 //    dvec3 change2[100];
 
-    dvec3 res[60];
+    dvec3 res[100];
     int count1 = 0;
     int count2 = 0;
     for (int i = 0; i < parent1.num_cubes; i++) {

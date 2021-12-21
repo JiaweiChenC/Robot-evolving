@@ -33,7 +33,7 @@ struct knl_Robot {
     knl_Mass*  masses;
     knl_Mass knl_masses[500];
     knl_Spring knl_springs[1500];
-    dvec3 existCubes[60] = {-10, 0, 0};
+    dvec3 existCubes[100] = {-10, 0, 0};
     unsigned int num_springs = 0;
     unsigned int num_masses = 0;
     unsigned int num_cubes = 0;

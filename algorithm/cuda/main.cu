@@ -42,6 +42,9 @@ void d_selection(std::vector<Robot>& robots, double* distances) {
         nextGeneration.push_back(robot);
     }
     robots = nextGeneration;
+    cudaFree(device_distances);
+    cudaFree(d_winners);
+    cudaFree(devStates);
 }
 
 
@@ -89,6 +92,8 @@ void evolve(std::vector<Robot>& robots) {
     }
     delete[] new_knl_robots;
     delete[] knl_robots;
+    cudaFree(d_knl_robots);
+    cudaFree(devStates);
 }
 
 
@@ -213,7 +218,7 @@ int main(void) {
     std::ofstream parameters;
     parameters.open("/home/jc5667/example2/cube-stuff/algorithm/cuda/parameters.txt");
     std::srand(time(NULL));
-    std::vector<Robot> robots = geneticAlgorithm(2000, 3, 10, 5, true);
+    std::vector<Robot> robots = geneticAlgorithm(1000, 500, 10, 5, true);
     for (const auto& robot: robots) {
         for (const auto& cube: robot.existCube) {
             parameters << cube[0] << " " << cube[1] << " " << cube[2] << std::endl;
