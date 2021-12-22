@@ -177,8 +177,8 @@ std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robot
     std::vector<Robot> returnRobot;
     std::ofstream dotchart;
     std::ofstream learningCurve;
-    learningCurve.open("/home/jc5667/example2/cube-stuff/algorithm/cuda/learning_curve.txt");
-    dotchart.open("/home/jc5667/example2/cube-stuff/algorithm/cuda/dot_chart.txt");
+    learningCurve.open("./learning_curve.txt");
+    dotchart.open("./dot_chart.txt");
     
     for (int i = 0; i < generationNum; i++) {
         std::cout << "-----------------generation:" << i << "----------------" << std::endl;
@@ -215,7 +215,7 @@ std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robot
 
 int main(void) {
     std::ofstream parameters;
-    parameters.open("/home/jc5667/example2/cube-stuff/algorithm/cuda/parameters.txt");
+    parameters.open("./parameters.txt");
     std::srand(time(NULL));
     std::vector<Robot> robots = geneticAlgorithm(1000, 200, 10, 5, true);
     // select the best robot
