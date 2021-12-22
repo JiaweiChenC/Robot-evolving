@@ -23,6 +23,7 @@ For the latest C++/NVCC features, we have to use the latest CUDA toolkit instead
 2. Download and install the latest CUDA (e.g. [11.5](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=18.04&target_type=runfile_local) as we used in our project) 
 
 # Instructions to run
+There are two file in the repo, the cube_0 file is used for the OpenGL stuff, and the algorithm file has two files, a cuda file contains the parallel implementation, and a cpu file contains the serial implementation. 
 To run the algorithm with parallel implementation:
 1. enter algorithm/cuda
 2. $make evolution
