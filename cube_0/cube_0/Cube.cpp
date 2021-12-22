@@ -44,21 +44,15 @@ using namespace std;
 Robot::Robot(double x, double y, double z, int robotSize){
     int randomChoiceCube;
     int randomChoiceFace;
-    //cout << x << " " << y << " " << z << " " << endl;
     createCube(x, y, z);
-//    cout << "the first cube" << endl;
     while(cube_num < robotSize){
         // choose a cube randomly
         randomChoiceCube = rand() % cubes.size();
-//        cout << "random choose cube: " << randomChoiceCube << endl;
         Cube cube = cubes[randomChoiceCube];
         // choose a face randomly
         randomChoiceFace = rand() % 6;
-//        cout << "random choose face: " << randomChoiceFace << endl;
-        // generate a cube in front
         switch (randomChoiceFace) {
             case 0:
-                // create a front cube
                 if (checkExist(cube.center[0] + 0.1, cube.center[1], cube.center[2])) break;
                 else {
                     createCube(cube.center[0] + 0.1, cube.center[1], cube.center[2]);
@@ -125,15 +119,12 @@ bool Robot::checkExist(double x, double y, double z) {
 
 void Robot::createCube (double x, double y, double z) {
     Cube cube;
-    //cout << "cube num" << cubes.size() << endl;
     // this center is a center of xy face
     cube.center = {x, y, z};
-    //cout << "x: " << x << " y: " << y << " z: " << z << endl;
     cube_num += 1;
     vector<double> position = {x ,y ,z};
     existCube.push_back(position);
     int n = (int)masses.size();
-    // int n2 = (int)springs.size();
     // first create 8 masses
     vector<Mass> tempMasses(8);
     tempMasses[0] = {MASS,{x+LENGTH/2,y+LENGTH/2,z},{0,0,0},{0,0,0},{0,0,0}};
@@ -198,12 +189,6 @@ void Robot::createCube (double x, double y, double z) {
         spring.a= spring.L0;
     }
     cubes.push_back(cube);
-    //cout << "coinciding: " << coinciding.size() << endl;
-    //cout << "imMasses: ";
-//    for (const auto& i: imMasses) {
-//        cout  << i << " " ;
-//    }
-    //cout << "imMasses size: " << imMasses.size() << endl;
 }
 
 void Robot::someStuffToMakesuretheDrawingWroking() {
@@ -228,7 +213,6 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
         }
         assert(upper.size() == 4);
         assert(down.size() == 4);
-//        cout << upper[0]<<  endl;
         //  flip the position if wrong
         if (masses[upper[0]].p.z < masses[down[0]].p.z) {
             vector<int> temp = upper;
@@ -246,8 +230,6 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
         }
         assert(front.size() == 2);
         assert(back.size() == 2);
-//        cout << "front: " << front.size() << endl;
-//        cout << "back: " << back.size() << endl;
         // change the position if wrong
         if (masses[front[0]].p.y < masses[back[0]].p.y) {
             vector<int> temp = front;
@@ -287,18 +269,14 @@ void Robot::someStuffToMakesuretheDrawingWroking() {
                 tempCube[3] = down[p];
             }
         }
-//        cout << "tempCube: ";
         for (int j = 0; j < 8; j++) {
             imMasses[8 * i + j] = tempCube[j];
-//            cout << tempCube[j] <<" " ;     
         };
         
         for (int k = 0; k < 12; k++) {
             cubeIndices.push_back(tempCube[faceIndices[k][0]]);
             cubeIndices.push_back(tempCube[faceIndices[k][1]]);
             cubeIndices.push_back(tempCube[faceIndices[k][2]]);
-//            cubeIndices[36 * i + 1 + 3 * k] = tempCube[faceIndices[k][1]];
-//            cubeIndices[36 * i + 2 + 3 * k] = tempCube[faceIndices[k][2]];
         }
         for (int g = 0; g < 12; g++) {
             myEdge_indices.push_back(tempCube[edgeIndices[g][0]]);
@@ -312,7 +290,6 @@ void Robot::updateVertices() {
     for (int i = 0; i < masses.size(); i++) {
         for (int j = 0; j < 3; j++) {
             cubeVertices.push_back(masses[i].p[j]);
-//            cubeVertices[3 * i + j] = masses[i].p[j];
         }
     }
     for (int i = 0; i < masses.size(); i++) {
@@ -342,16 +319,6 @@ void Robot::updateVertices() {
 }
 
 void Robot::breathing() {
-//    for (int i = 0; i < springs.size(); i++) {
-//        // choose 0, 2, 6, 8, 13 as motor cube
-//        springs[i].k = gene.k[i];
-//    }
-//    for (int i = 0; i < 9; i++){
-//            for (int j = 0; j < 20; j++) {
-//                springs[20 * i + j].b = gene.b[i];
-//                springs[20 * i + j].c = gene.c[i];
-//            }
-//    }
     for (int i = 0; i < 28; i++) {
     springs[i].L0 = springs[i].a + springs[i].b * sin(omega * T + springs[i].c);
     }
@@ -411,7 +378,6 @@ void Robot::updateRobot() {
             double F_c = -kGround * masses[i].p.z;
             masses[i].force.z += F_c;
             glm::dvec3 frictionForce(0.0);
-//            cout << "friction" << frictionDirection.x << "  " << frictionDirection.y << "  " << frictionDirection.z << " ";
             frictionForce = frictionDirection * F_c * mu;
             masses[i].force += frictionForce;
         }
@@ -430,19 +396,16 @@ void runningSimulate(Robot& robot, double runningTime) {
     robot.resetMass();
     Robot tempRobot = robot;
     tempRobot.startPos = tempRobot.getPosition();
-//    cout << "startPos: " << tempRobot.startPos[0] << " " << tempRobot.startPos[1] << endl;
     double runTime = 0;
     double dtime = 0.001;
     while (runTime < runningTime) {
         for (int i = 0; i < 28; i++) {
         tempRobot.springs[i].L0 = tempRobot.springs[i].a + 0.02 * sin(omega * runTime + 0.01 * M_PI);
-//            cout << "L0: " << tempRobot.springs[i].L0 << endl;
         }
         tempRobot.updateRobot();
         runTime += dtime;
     }
     tempRobot.currentPos = tempRobot.getPosition();
-//    cout << "end: " << tempRobot.currentPos[0] << " " << tempRobot.currentPos[1] << endl;
     robot.moveDistance = glm::distance(tempRobot.startPos, tempRobot.currentPos);
     std::cout << "running distance: " << robot.moveDistance << endl;
 }
@@ -459,12 +422,10 @@ glm::dvec2 Robot::getPosition() {
     glm::dvec2 pos2D(0.0);
     for (const Mass& mass: masses) {
         pos += mass.p;
-//        cout << "pos: " << mass.p[0] << " " << mass.p[1] << endl;
     }
     pos2D[0] = pos.x;
     pos2D[1] = pos.y;
     glm::dvec2 res = pos2D/(double)masses.size();
-//    cout << "pos2D: " << pos2D[1] << endl;
     return res;
 }
 
@@ -492,7 +453,6 @@ vector<Robot> crossoverRobot(Robot parent1, Robot parent2) {
     }
     // exchangable height
     double height = min(height1, height2);
-    // choose a layer, +0.1 to avoid rand() % 0;
     int randomChoice = rand() % (int)((height + 0.1)/0.1) - 1;
     height = 0.1 * double(randomChoice);
     // record the cube need to exchange
@@ -508,13 +468,11 @@ vector<Robot> crossoverRobot(Robot parent1, Robot parent2) {
     
     child1 = deleteCubes(parent1, change1);
     for (const vector<double>& change: change2) {
-//            if (!child1.checkExist(change[0], change[1], change[2]))
         child1.createCube(change[0], change[1], change[2]);
     }
     
     child2 = deleteCubes(parent2, change2);
     for (const vector<double>& change: change1) {
-//            if (!child2.checkExist(change[0], change[1], change[2]))
         child2.createCube(change[0], change[1], change[2]);
     }
     twoChild.push_back(child1);
@@ -548,7 +506,6 @@ Robot mutateRobot(Robot robot) {
             else {
                 choice = rand() % robot.existCube.size();
                 times++;
-                // cout << "times: " << time << endl;
                 if (times > 4) {
                     mutateType = 1;
                     mutate1 = 1;
@@ -563,11 +520,9 @@ Robot mutateRobot(Robot robot) {
                 // choose a cube randomly
                 int randomChoiceCube, randomChoiceFace;
                 randomChoiceCube = rand() % robot.cubes.size();
-        //        cout << "random choose cube: " << randomChoiceCube << endl;
                 Cube cube = robot.cubes[randomChoiceCube];
                 // choose a face randomly
                 randomChoiceFace = rand() % 6;
-        //        cout << "random choose face: " << randomChoiceFace << endl;
                 // generate a cube in front
                 switch (randomChoiceFace) {
                     case 0:
@@ -806,59 +761,4 @@ vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotRetur
     return returnRobot;
 }
 
-void randomSearch(int robotCount, int generationNum, bool record) {
-    ofstream randomSearchdata;
-    randomSearchdata.open("/Users/jiaweichen/Desktop/data.txt");
-    double bestFitness = 0;
-        for (int j = 0; j < generationNum; j++) {
-            double bestFitnessinGeneration = 0;
-            vector<Robot> robotGroup = generateRobotGroup(robotCount);
-            for (Robot& robot: robotGroup) {
-                runningSimulate(robot, 2);
-                if (robot.moveDistance > bestFitnessinGeneration) {
-                    bestFitnessinGeneration = robot.moveDistance;
-                }
-            }
-            cout << "generation: " << j << endl;
-            if (bestFitnessinGeneration > bestFitness) bestFitness = bestFitnessinGeneration;
-            randomSearchdata << bestFitness << endl;
-    }
-    randomSearchdata.close();
-}
-
-
-void hillClimber(int robotCount, int generationNum) {
-    ofstream hillClimber;
-    hillClimber.open("/Users/jiaweichen/Desktop/data.txt");
-    double bestFitness = 0;
-    Robot bestRobot;
-    vector<Robot> robotGroup = generateRobotGroup(robotCount);
-    for (Robot& robot: robotGroup) {
-        runningSimulate(robot, 2);
-        if (robot.moveDistance > bestFitness) {
-            bestRobot = robot;
-            bestFitness = robot.moveDistance;
-        }
-    }
-    for (int i = 0; i < generationNum; i++) {
-        double bestFitnessInGeneration = 0;
-        Robot bestRobotInGeneration;
-        vector<Robot> newRobotGroup;
-        for (int i = 0; i < robotCount; i++) {
-            Robot newRobot = mutateRobot(bestRobot);
-            newRobotGroup.push_back(newRobot);
-        }
-        for (Robot& robot: newRobotGroup) {
-            runningSimulate(robot, 2);
-            if (robot.moveDistance > bestFitnessInGeneration) {
-                bestFitnessInGeneration = robot.moveDistance;
-                bestRobotInGeneration = robot;
-            }
-        }
-        if (bestFitnessInGeneration > bestFitness ) {
-            bestFitness = bestFitnessInGeneration;
-        }
-        hillClimber << bestFitness << endl;
-    }
-}
 
