@@ -36,14 +36,12 @@ double b = 0.1;
 double c = 0.1;
 
 
-bool animation = false;
+bool animation = true;
 
 extern vector<GLdouble> cubeColor;
 extern vector<GLdouble> pointColor;
 extern vector<GLdouble> cubeVertices;
-//GLdouble cubeColor[mass_num * 3 * robot_num]; // cube_count * 64 points * 3 bit
 extern vector<GLuint> cubeIndices;
-// cube_count * 6 faces * 2 triangles * 3 indices
 extern vector<GLdouble> myEdge_color;      // cube_count * 8 points * 3 bit
 extern vector<GLuint> myEdge_indices; // cube_count * 12 * 2
 
@@ -99,7 +97,6 @@ float skyboxVertices[] = {
 
 
 float planeVertices[] = {
-    // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
      5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
     -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
     -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
@@ -153,8 +150,7 @@ vector<vector<GLuint>> edgeIndices{
 int main()
 {
     srand(time(NULL));
-//    vector<Robot> robots = geneticAlgorithm(10, 1, 10, 2, true);
-    randomSearch(400, 100, true);
+    // generate 10 robots
     Robot robot0(0, 0.0, 0.0,20);
     Robot robot1(-1, 0.0, 0.0, 20);
     Robot robot2(-2, 0.0, 0.0, 20);
@@ -167,6 +163,7 @@ int main()
     
     ifstream inData;
     vector<vector<double>> cubes(25, vector<double> (3));
+    // change this path to your path if you want to import data
     inData.open("/Users/jiaweichen/Desktop/data.txt");
     for (int i=0; i<25; i++) {
     inData >> cubes[i][0] >> cubes[i][1] >> cubes[i][2];
@@ -176,18 +173,7 @@ int main()
     Robot robotz(cubes);
     robot0 = robotz;
     robot0.resetMass();
-//    vector<vector<double>> pos;
-//    pos.push_back(p1);
-//    pos.push_back(p2);
-//    pos.push_back(p3);
-//    pos.push_back(p4);
-//    robot0  = deleteCubes(robot0, pos);
-//    for (int i = 0; i < 12 ; i++)
-//    {robot1 = mutateRobot(robot1);}
-//    vector<Robot> child = crossoverRobot(robot0, robot1);
-//    robot1 = child[0];
-//    robot0 = child[1];
-    cout << "size: " << robot1.cubes.size() << endl;
+
     vector<Robot> robotGroup;
     robotGroup.push_back(robot0);
     robotGroup.push_back(robot1);
@@ -199,33 +185,6 @@ int main()
     robotGroup.push_back(robot7);
     robotGroup.push_back(robot8);
 
-//    int num = 0;
-//    for (const auto& cube: robotGroup) {
-//        cout << "robot " << num << ": " << endl;
-//        for(const auto& position: cube.existCube) {
-//            cout << position[0] << " " << position[1] << " " << position[2] << endl;
-//            num += 1;
-//        }
-//    }
-//    for (const auto& robot: robotGroup) {
-//        cout << robot.masses.size() << endl;
-//    }
-//    cout << "masses.size" << robot0.masses.size() << endl;
-//    cout << "cube_num :" <<robot0.cube_num << endl;
-//    cout << "color size" << cubeCoslor.size() << endl;
-//    cout << "masses indices" << robot0.imMasses.size() << endl;
-//    for (const auto& i: robot1.masses) {
-//        cout << i.p[0] << " " << i.p[1] << " " << i.p[2] << " " << endl;
-//    }
-//    for (const auto& i: robot0.existCube) {
-//        cout << "exist: " << i[0] << " " << i[1]  << " " << i[2] <<   " " << endl;
-//    }
-//    for (int i = 0; i < robot0.imMasses.size(); i++) {
-//        if(i % 8 == 0) {
-//            cout << endl;
-//        }
-//        cout << robot0.imMasses[i] << " ";
-//    }
     for (int i = 0; i < robotGroup.size(); i++) {
         robotGroup[i].updateVertices();
         robotGroup[i].someStuffToMakesuretheDrawingWroking();
@@ -237,19 +196,6 @@ int main()
         cubeIndices.clear();
         myEdge_indices.clear();
     }
-    
-    
-    cout << "group size: " << cubeIndicesGroup.size() << endl;
-    cout <<" _____________ "<<cubeIndices.size() << endl;
-    cout << "cube Indices.size: " << cubeIndices.size() << endl;
-    cout << "size: " << cubeIndices.size() << endl;
-    cout << "vertices: " << cubeVertices.size() << endl;
-    cout << "size is " << robot0.masses.size() << endl;
-    //    for (int i = 0; i < robot0.masses.size(); i++) {
-    //        cout << "position" << robot0.masses[i].p[0] << ", " << robot0.masses[i].p[1] <<", " << robot0.masses[i].p[2] << endl;
-    //    }
-
-    //    robot0.runningSimulate(2);
     if (animation){
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -337,8 +283,6 @@ int main()
             glBindVertexArray(cubeVAO[i]);
             glBindBuffer(GL_ARRAY_BUFFER, cubeVBO[i]);
             assert(cubeVertices.size() != 0);
-//            cout << "i: " << cubeVertices.size() << endl;
-//            cout << "I: " << cubeVertices.data() << endl;
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO[i]);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndicesGroup[i].size() * 4, cubeIndicesGroup[i].data(), GL_DYNAMIC_DRAW);
@@ -405,16 +349,10 @@ int main()
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 0.0f);
         if (true){
             
-//            robot0.runningSimulate(2);
-//            robot0.setDistance();
             T += dt;
             cout << "global Time: " << T << endl;
-//            cout << "global time: " << T << endl;
-//            cout <<"at height: " << robot0.getPosition().z << endl;
-//            cout <<"travel distance" << robot0.getDistance() << endl;
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            // std::cout << "Global Time now: " << T << endl;
 
             glDepthFunc(GL_LESS);
             planeShader.use();
@@ -428,11 +366,9 @@ int main()
             glBindTexture(GL_TEXTURE_2D, floorTexture);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
-//
             model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1, 0, 0));
             model = glm::translate(model, vec3(0.5, -0.5, -0.5));
 
-            // robot 0
             for (int i = 0; i < 1; i++) {
                 robotGroup[i].updateRobot();
                 robotGroup[i].updateVertices();
@@ -444,7 +380,7 @@ int main()
                 glBindVertexArray(cubeVAO[i]);
                 glBindBuffer(GL_ARRAY_BUFFER, cubeVBO[i]);
                 glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
-                glDrawElements(GL_TRIANGLES, 12 * 3 * robotGroup[i].cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+                glDrawElements(GL_TRIANGLES, 12 * 3 * robotGroup[i].cube_num, GL_UNSIGNED_INT, 0); 
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
                 glBindVertexArray(0);
                 
@@ -454,7 +390,7 @@ int main()
                 glBindVertexArray(edgeVAO[i]);
                 glBindBuffer(GL_ARRAY_BUFFER, edgeVBO[i]);
                 glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
-                glDrawElements(GL_LINES, 12 * 2 * robotGroup[i].cube_num, GL_UNSIGNED_INT, 0); // 12 triangle 3 points 27 cube
+                glDrawElements(GL_LINES, 12 * 2 * robotGroup[i].cube_num, GL_UNSIGNED_INT, 0); 
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
                 glBindVertexArray(0);
                 
@@ -467,11 +403,10 @@ int main()
                 glBufferData(GL_ARRAY_BUFFER, pointColor.size() * 8, pointColor.data(), GL_DYNAMIC_DRAW);
                 glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
                 glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * 8, cubeVertices.data(), GL_DYNAMIC_DRAW);
-                glDrawArrays(GL_POINTS, 0, (int)robotGroup[i].masses.size());// 12 triangle 3 points 27 cube
+                glDrawArrays(GL_POINTS, 0, (int)robotGroup[i].masses.size());
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
                 glBindVertexArray(0);
                 
-//                cout << i << "  "<<  robotGroup[i].getPosition()[0]<< " " << robotGroup[i].getPosition()[1] <<" " <<  robotGroup[i].getPosition()[2] << endl;
                 cubeVertices.clear();
                 pointColor.clear();
                 cubeColor.clear();
