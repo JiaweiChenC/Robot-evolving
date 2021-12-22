@@ -34,4 +34,8 @@ To run the algorithm with serial implementation:
 3. $./evolution
 
 To run the OpenGL file
-1. Link needed library, e.g., GLFW, GLAD, GLM;
+The OpenGL program is written in Xcode, thus it's a better choice to run this code on mac system
+1. Install needed library, e.g., GLFW https://www.glfw.org/, and GLM https://github.com/g-truc/glm, The GLAD already exist in the project, but if it doesn't work, you can try to install a GLAD. GLAD https://glad.dav1d.de/; If you have brew, you can use just use brew to install GLFW and GLM
+3. Link the library in Xcode, i.e., change the header search path, and library search path;
+4. Build and run the program in Xcode.
+The running process should be similar when you are trying to run this code in windows system.
