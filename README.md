@@ -16,7 +16,13 @@ we use one thread to do the genetic operations for one robot. In selection, we u
 and selects the winners inside each group. The winners are chosen based on their fitness(the move distance). We also make use of shared memory in the selection 
 process.
 
-# How to run this code
+# Prerequisites
+For the latest C++/NVCC features, we have to use the latest CUDA toolkit instead of the installation provided by the instructors. Therefore:
+
+1. Follow instructions [here](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#handle-uninstallation) to uninstall existing CUDA, or simply start a brand new VM.
+2. Download and install the latest CUDA (e.g. [11.5](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=18.04&target_type=runfile_local) as we used in our project) 
+
+# Instructions to run
 To run the algorithm with parallel implementation:
 1. enter algorithm/cuda
 2. $make evolution
@@ -29,7 +35,3 @@ To run the algorithm with serial implementation:
 
 To run the OpenGL file
 1. Link needed library, e.g., GLFW, GLAD, GLM;
-
-# Possible Error Scenario
-All the codes are created and tested based on the CUDA 2021, makefile may not work with a different CUDA version.
-
