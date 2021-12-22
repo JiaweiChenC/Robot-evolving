@@ -24,6 +24,7 @@ For the latest C++/NVCC features, we have to use the latest CUDA toolkit instead
 
 # Instructions to run
 There are two file in the repo, the cube_0 file is used for the OpenGL stuff, and the algorithm file has two files, a cuda file contains the parallel implementation, and a cpu file contains the serial implementation. 
+\\
 To run the algorithm with parallel implementation:
 1. enter algorithm/cuda
 2. $make evolution
