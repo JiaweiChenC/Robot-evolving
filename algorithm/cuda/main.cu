@@ -8,11 +8,11 @@
 #include "kernel.cuh"
 
 
+// selection using tournament selection techenique
 void d_selection(std::vector<Robot>& robots, double* distances) {
     unsigned int N = robots.size();
 
     int winner_num = SELECT_PRESSURE * N;
-//    printf("winner_num %i\n", winner_num);
     // setup for kernel
     int* d_winners;
     cudaMalloc((void**)&d_winners, winner_num * sizeof(int));
@@ -33,13 +33,14 @@ void d_selection(std::vector<Robot>& robots, double* distances) {
     cudaMemcpy(new_winners, d_winners, winner_num * sizeof(int), cudaMemcpyDeviceToHost);
  
     std::vector<Robot> nextGeneration;
+    // because we selected we need to add some robot to the next generation to keep the population size
     for (int i = 0; i < winner_num; i++) {
         nextGeneration.push_back(robots[new_winners[i]]);
-//        printf("host winners: %i\n", new_winners[i]);
     }
+    int m = 0;
     while (nextGeneration.size() < N) {
-        Robot robot(0, 0, 0, 20);
-        nextGeneration.push_back(robot);
+        nextGeneration.push_back(robots[m]);
+        ++ m;
     }
     robots = nextGeneration;
     cudaFree(device_distances);
@@ -63,10 +64,8 @@ void evolve(std::vector<Robot>& robots) {
             knl_robots[i].existCubes[j].x = robot.existCube[j][0];
             knl_robots[i].existCubes[j].y = robot.existCube[j][1];
             knl_robots[i].existCubes[j].z = robot.existCube[j][2];
-            //printf("x: %f, y: %f, z: %f\n", knl_robot.existCubes[j].x,  knl_robot.existCubes[j].y, knl_robot.existCubes[j].z);
         }
     }
-//    printf("Best robot has:  %i cubes\n", knl_robots[0].num_cubes);
     knl_Robot* d_knl_robots;
     cudaMalloc((void**)&d_knl_robots,N * sizeof(knl_Robot)); 
     cudaMemcpy(d_knl_robots, knl_robots, N * sizeof(knl_Robot), cudaMemcpyHostToDevice);
@@ -80,6 +79,7 @@ void evolve(std::vector<Robot>& robots) {
 
     // mutate kernel
     glb_mutate<<<grid, block>>>(d_knl_robots, N, devStates);
+
     // crossover kernel
     glb_crossover<<<grid, block>>>(d_knl_robots, N, devStates);
     cudaDeviceSynchronize();
@@ -171,6 +171,7 @@ void simulateRobots(const std::vector<Robot>& robots, double* distances) {
 
     delete[] knl_robots;
 }
+// genetic algorithm
 std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robotReturn, double cycleTime, bool record) {
     std::vector<Robot> robotGroup = generateRobotGroup(robotCount);
     std::vector<Robot> returnRobot;
@@ -179,7 +180,6 @@ std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robot
     learningCurve.open("/home/jc5667/example2/cube-stuff/algorithm/cuda/learning_curve.txt");
     dotchart.open("/home/jc5667/example2/cube-stuff/algorithm/cuda/dot_chart.txt");
     
-    // create a list of robot
     for (int i = 0; i < generationNum; i++) {
         std::cout << "-----------------generation:" << i << "----------------" << std::endl;
 
@@ -197,14 +197,12 @@ std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robot
         }
         dotchart << std::endl;
         std::cout << "Greatest distance is: " << greatest_distance << std::endl;
+        // select the robot for next generation
         d_selection(robotGroup, distances);
         delete[] distances;
-        // ranking and crossover
         learningCurve << greatest_distance<< std::endl;
-//        std::cout << "best in this generation: " << robotGroup[0].moveDistance << std::endl;
         // mutate and crossover
         evolve(robotGroup);
-//        std::cout << "finished generation: " << i << std::endl;
 
     }
     for (int i = 0; i < robotReturn; i++) {
@@ -214,39 +212,34 @@ std::vector<Robot> geneticAlgorithm(int robotCount, int generationNum, int robot
     learningCurve.close();
     return returnRobot;
 }
+
 int main(void) {
     std::ofstream parameters;
     parameters.open("/home/jc5667/example2/cube-stuff/algorithm/cuda/parameters.txt");
     std::srand(time(NULL));
-    std::vector<Robot> robots = geneticAlgorithm(1000, 500, 10, 5, true);
-    for (const auto& robot: robots) {
-        for (const auto& cube: robot.existCube) {
-            parameters << cube[0] << " " << cube[1] << " " << cube[2] << std::endl;
+    std::vector<Robot> robots = geneticAlgorithm(1000, 200, 10, 5, true);
+    // select the best robot
+    double longest_distance;
+    Robot fastest_robot;
+    for (const auto& robot: robots){
+        if (robot.moveDistance > longest_distance) {
+            longest_distance = robot.moveDistance;
+            fastest_robot = robot;
         }
-        parameters << "robot: " << std::endl;
     }
-    // TODO
-
-
-// test for mutation
-//    int N = 100;
-//    curandState *devStates;
-//    cudaMalloc((void**)&devStates, N * sizeof(devStates));
-//    dim3 grid((N + 512 - 1) / 512, 1, 1);
-//    dim3 block(512, 1, 1);
-//    setup_kernel<<<grid, block>>>(devStates);
-//
-//    std::vector<Robot> robotGroup = generateRobotGroup(N);
-//    mutate(robotGroup, devStates);
-//    for (int i = 0; i < N; i++) {
-//    printf("robotGroup size: %lu\n,  %lu\n ", robotGroup.size(), robotGroup[i].cubes.size());
-//    }
+    // record the best robot
+    for (const auto& cube: fastest_robot.existCube) {
+        for (int i = 0; i < 3; i++){
+            parameters << cube[i] << " ";
+        }
+        parameters << std::endl;
+    }
+    parameters.close();
+    // check cuda error
     cudaError_t error = cudaGetLastError();
     if(error != cudaSuccess)
     {
-    // print the CUDA error message and exit
     printf("CUDA error: %s\n", cudaGetErrorString(error));
     exit(-1);
     }
-    cudaDeviceSynchronize();
 }
