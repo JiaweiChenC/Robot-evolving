@@ -1,17 +1,16 @@
 # Evolving soft robot with CUDA C++
 A genetic algorithm to find the fastest soft robot using the CUDA Architecture (GPU). 
-This is done by Ruowang Zhang & Jiawei Chen as a final project for the EECSE 4750 Heterogeneous computing course at Columbia University in 2021 fall 
+This is implemented by Ruowang Zhang & Jiawei Chen as a final project for the EECSE 4750 Heterogeneous computing course at Columbia University in 2021 fall 
 . In this project, we firstly build a physical simulator, with which we measure the performance of soft robots and evolve them to search for the fastest
-soft robot!
+soft robot! This project is implemented completely from scratch, except for the imported libraries.
 
-# Phisical simulator with OpenGL
-We built a physical simulator with OpenGL from scratch. All the configurations of our simulator can be found in the algorithm/cuda/config.hpp file. The simulator consists
-of two parts: the environment and the robot. The environment will provide gravity and friction to the soft robot. Each soft robot is consists of a bunch of 
+# Physical simulator with OpenGL
+We built a physical simulator with OpenGL from scratch. All the configurations of our simulator can be found in the algorithm/cuda/config.hpp file. The simulator consists of two parts: the environment and the robot. The environment will provide gravity and friction to the soft robot. Each soft robot is consists of a bunch of 
 cubes, and each cube is consists of 8 masses and 28 springs. Making the springs in a cube breathing (the length of the springs changed over time), and the 
 cube is the so-called motor.
 
 # Overview:
-In this project, we evolve the soft robots using GA. We parallel simulation, mutation, crossover, and selection processes. In simulation, crossover, and mutation,
+In this project, we evolve the soft robots using GA. We parallelize simulation, mutation, crossover, and selection processes. In simulation, crossover, and mutation,
 we use one thread to do the genetic operations for one robot. In selection, we use tournament selection, which is divided the whole population into small groups
 and selects the winners inside each group. The winners are chosen based on their fitness(the move distance). We also make use of shared memory in the selection 
 process.
@@ -33,8 +32,8 @@ To run the algorithm with parallel implementation:
 
 To run the algorithm with serial implementation:
 1. enter algorithm/cpu
-2. $make evolution
-3. $./evolution
+2. $ make evolution
+3. $ ./evolution
 4. The result will be a learning curve of our GA, a dot chart file record the running distance of all the robots in each generation, and the parameters file which record the parameters of the best robot, the data in parameters file can be import to the OpenGL function, and then you can see how the robot running.
 
 To run the OpenGL file 
@@ -43,6 +42,8 @@ To run the OpenGL file
 3. Link the library in Xcode, i.e., change the header search path and library search path, and add the OpenGL framework;
 4. Build and run the program in Xcode.
 5. To simulate the best robot we found, firstly, enter cube_0/LearnOpenGL/main.cpp, and change the ifstream(indata) path to a .txt file path on your computer, and then paste the parameters into the .txt file. The parameters are just a bunch of coordinates decide where exist a cube. The parameters of our best robot is: 
+
+```
 0 0 0
 -0.1 0 0
 0.1 0 0
@@ -53,6 +54,9 @@ To run the OpenGL file
 -0.1 0.1 0.1
 0 0.1 0.1
 -0.1 -0.1 0.1
-0 -0.1 0.1, also you can run the parallel implementation file, and import the data in file parameters to the data.txt file.
+0 -0.1 0.1
+```
+
+Alternatively you can run the parallel algorithm itself, and import the data in file parameters to the data.txt file.
 
 The running process should be similar when you are trying to run this code in windows system.
