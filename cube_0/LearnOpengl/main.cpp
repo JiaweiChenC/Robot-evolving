@@ -369,7 +369,7 @@ int main()
             model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1, 0, 0));
             model = glm::translate(model, vec3(0.5, -0.5, -0.5));
 
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 9; i++) {
                 robotGroup[i].updateRobot();
                 robotGroup[i].updateVertices();
                 robotGroup[i].breathing();
