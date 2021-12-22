@@ -38,4 +38,5 @@ The OpenGL program is written in Xcode, thus it's a better choice to run this co
 1. Install needed library, e.g., GLFW https://www.glfw.org/, and GLM https://github.com/g-truc/glm, The GLAD already exist in the project, but if it doesn't work, you can try to install a GLAD. GLAD https://glad.dav1d.de/; If you have brew, you can use just use brew to install GLFW and GLM
 3. Link the library in Xcode, i.e., change the header search path and library search path, and add the OpenGL framework;
 4. Build and run the program in Xcode.
+5. To simulate the best robot we found, firstly, enter cube_0/l
 The running process should be similar when you are trying to run this code in windows system.
