@@ -37,9 +37,9 @@ To run the algorithm with serial implementation:
 3. $./evolution
 4. The result will be a learning curve of our GA, a dot chart file record the running distance of all the robots in each generation, and the parameters file which record the parameters of the best robot, the data in parameters file can be import to the OpenGL function, and then you can see how the robot running.
 
-To run the OpenGL file
-The OpenGL program is written in Xcode, thus it's a better choice to run this code on mac system
-1. Install needed library, e.g., GLFW https://www.glfw.org/, and GLM https://github.com/g-truc/glm, The GLAD already exist in the project, but if it doesn't work, you can try to install a GLAD. GLAD https://glad.dav1d.de/; If you have brew, you can use just use brew to install GLFW and GLM
+To run the OpenGL file 
+1. The OpenGL program is written in Xcode, thus it's a better choice to run this code on mac system
+2. Install needed library, e.g., GLFW https://www.glfw.org/, and GLM https://github.com/g-truc/glm, The GLAD already exist in the project, but if it doesn't work, you can try to install a GLAD. GLAD https://glad.dav1d.de/; If you have brew, you can use just use brew to install GLFW and GLM
 3. Link the library in Xcode, i.e., change the header search path and library search path, and add the OpenGL framework;
 4. Build and run the program in Xcode.
 5. To simulate the best robot we found, firstly, enter cube_0/LearnOpenGL/main.cpp, and change the ifstream(indata) path to a .txt file path on your computer, and then paste the parameters into the .txt file. The parameters are just a bunch of coordinates decide where exist a cube. The parameters of our best robot is: 
