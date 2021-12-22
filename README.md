@@ -27,11 +27,13 @@ To run the algorithm with parallel implementation:
 1. enter algorithm/cuda
 2. $make evolution
 3. $./evolution
+4. The result will be a learning curve of our GA, a dot chart file record the running distance of all the robots in each generation, and the parameters file which record the parameters of the best robot, the data in parameters file can be import to the OpenGL function, and then you can see how the robot running.
 
 To run the algorithm with serial implementation:
 1. enter algorithm/cpu
 2. $make evolution
 3. $./evolution
+4. The result will be a learning curve of our GA, a dot chart file record the running distance of all the robots in each generation, and the parameters file which record the parameters of the best robot, the data in parameters file can be import to the OpenGL function, and then you can see how the robot running.
 
 To run the OpenGL file
 The OpenGL program is written in Xcode, thus it's a better choice to run this code on mac system
@@ -49,6 +51,6 @@ The OpenGL program is written in Xcode, thus it's a better choice to run this co
 -0.1 0.1 0.1
 0 0.1 0.1
 -0.1 -0.1 0.1
-0 -0.1 0.1
+0 -0.1 0.1, also you can run the parallel implementation file, and import the data in file parameters to the data.txt file.
 
 The running process should be similar when you are trying to run this code in windows system.
