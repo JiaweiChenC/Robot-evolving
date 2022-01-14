@@ -1,7 +1,5 @@
 # Evolving soft robot with CUDA C++
-A genetic algorithm to find the fastest soft robot using the CUDA Architecture (GPU). 
-This is implemented by Ruowang Zhang & Jiawei Chen as a final project for the EECSE 4750 Heterogeneous computing course at Columbia University in 2021 fall 
-. In this project, we firstly build a physical simulator, with which we measure the performance of soft robots and evolve them to search for the fastest
+In this project, we firstly build a physical simulator, with which we measure the performance of soft robots and evolve them to search for the fastest
 soft robot! This project, including the algorithems, is implemented completely from scratch, except for the imported libraries.
 
 # Physical simulator with OpenGL
